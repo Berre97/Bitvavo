@@ -178,8 +178,8 @@ class apibot():
         print('--------------------------------------------------------')
 
         indicators_buy = df.loc[last_index, ['RSI_Oversold', 'up_trend', 'up_trend']]
-        indicators_MACD = df.loc[last_index, ['RSI_Oversold, 'MACD_Bullish']
-        indicators_sell = df.loc[last_index, ['RSI_Overbought']
+        indicators_MACD = df.loc[last_index, ['RSI_Oversold, 'MACD_Bullish']]
+        indicators_sell = df.loc[last_index, ['RSI_Overbought']]
 
         order_number = random.randint(1000, 9999)
         if indicators_buy.all():
