@@ -1,0 +1,6 @@
+pandas
+ta
+numpy
+asyncio
+telegram
+python_bitvavo_api
