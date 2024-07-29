@@ -58,5 +58,25 @@
         "aankoopprijs": 0.38196,
         "aankoopdatum": "2024-07-29 17:00:00",
         "percentage_gain": "0.00"
+    },
+    {
+        "type": "Sold",
+        "symbol": "SOL-EUR",
+        "time": "2024-07-29 18:00:00",
+        "closing_price": 172.09,
+        "order": 1777,
+        "aankoopprijs": 172.09,
+        "aankoopdatum": "2024-07-29 18:00:00",
+        "percentage_gain": "0.00"
+    },
+    {
+        "type": "Sold",
+        "symbol": "ADA-EUR",
+        "time": "2024-07-29 18:00:00",
+        "closing_price": 0.37893,
+        "order": 5836,
+        "aankoopprijs": 0.37893,
+        "aankoopdatum": "2024-07-29 18:00:00",
+        "percentage_gain": "0.00"
     }
 ]
