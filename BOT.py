@@ -112,6 +112,8 @@ class apibot():
           # RSI Overbought / Oversold
           df['RSI_Overbought'] = np.where(df['RSI'] >= 60, True, False)
           df['RSI_Oversold'] = np.where(df['RSI'] <= 35, True, False)
+          df['RSI_Overbought_MACD'] = np.where(df['RSI'] >= 65, True, False)
+          df['RSI_Oversold_MACD'] = np.where(df['RSI'] <= 45, True, False)
 
           # MACD Crossovers
           df['MACD_Bullish'] = np.where((df['MACD'] > df['MACD_signal']) & (df['MACD'].shift(1) <= df['MACD_signal'].shift(1)), True, False)
