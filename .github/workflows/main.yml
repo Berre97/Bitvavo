@@ -2,7 +2,7 @@ name: Manage Data in Repository
 
 on:
   schedule:
-    - cron: '5 * * *  *'  # Draait dagelijks om 14:00, 20:00, 02:00, 08:00 UTC
+    - cron: '58 * * *  *'  # Draait dagelijks om 14:00, 20:00, 02:00, 08:00 UTC
   workflow_dispatch:  # Maakt handmatige triggers mogelijk
 
 jobs:
