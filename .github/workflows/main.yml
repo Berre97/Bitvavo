@@ -31,7 +31,7 @@ jobs:
       - name: Run script to handle JSON file
         env:
           FILE_PATH: ${{ env.FILE_PATH }}
-          API_KEYS: ${{ env.API_KEYS }}
+          API_KEYS: ${{ secrets.API_KEYS }}
         run: |
           python BOT.py
 
