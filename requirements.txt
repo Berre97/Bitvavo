@@ -1,6 +1,6 @@
-pandas
-ta
-numpy
-asyncio
-telegram
-python_bitvavo_api
+pandas==2.2.2
+ta==0.11.0
+numpy==1.26.4
+asyncio==3.4.3
+python-telegram-bot==21.4
+python_bitvavo_api==1.4.2
