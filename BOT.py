@@ -214,8 +214,7 @@ class apibot():
             for i in self.load_data(self._file_path):
                 stop_limit = float(i['closing_price'] * 0.92
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                    float(last_row['close']) <= float(i['closing_price']) * 0.95 >= stop_limit:
-
+                        float(last_row['close']) <= float(i['closing_price']) * 0.95 >= stop_limit:
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
 
@@ -234,8 +233,8 @@ class apibot():
                     await self.send_telegram_message(stoploss_message)
 
                 elif indicators_sell.all():
-                    if i['type'] == 'Bought' and i['symbol'] == last_row['market']:
-                        # float(last_row['close']) >= float(i['closing_price']) * 1.15:
+                    if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
+                            float(last_row['close']) >= float(i['closing_price']) * 1.15:
 
                         percentage = (float(last_row['close']) - float(i['closing_price'])) / float(i['closing_price']) * 100
                         percentage = format(percentage, ".2f")
