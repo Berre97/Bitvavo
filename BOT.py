@@ -11,20 +11,6 @@ from datetime import datetime, timedelta
 import os
 import random
 
-#
-# bitvavo = Bitvavo({
-#     'APIKEY': '5d5bec386e219fc32df2b3973c2440b685d2f2b219acd15e8c009b307f709216',
-#     'APISECRET': 'c5ff1b5166f7a757e713cc1020f568e1f4495e2b1c402f3f3f1c6950787e7a806caee51b5d33b477a550cffb6fb3b3f2eeab67dd08e9a68a4a20de8c6def8f72',
-#     'RESTURL': 'https://api.bitvavo.com/v2',
-#     'WSURL': 'wss://ws.bitvavo.com/v2/'
-# })
-#
-#
-#
-# token = Bot(token='7277331559:AAGtyCZcKJ2UI80U6sqJo5jcjQrHD2BXlB8')
-# chat_id = -1002203456191
-
-
 api_keys= json.loads(os.getenv('API_KEYS'))
 
 bitvavo = Bitvavo({
