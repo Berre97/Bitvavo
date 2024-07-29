@@ -110,8 +110,8 @@ class apibot():
           df['down_trend'] = np.where(df['SMA_50'] > df['SMA_20'], True, False) #50, 200
 
           # RSI Overbought / Oversold
-          df['RSI_Overbought'] = np.where(df['RSI'] >= 65, True, False)
-          df['RSI_Oversold'] = np.where(df['RSI'] <= 30, True, False)
+          df['RSI_Overbought'] = np.where(df['RSI'] >= 60, True, False)
+          df['RSI_Oversold'] = np.where(df['RSI'] <= 35, True, False)
 
           # MACD Crossovers
           df['MACD_Bullish'] = np.where((df['MACD'] > df['MACD_signal']) & (df['MACD'].shift(1) <= df['MACD_signal'].shift(1)), True, False)
@@ -177,20 +177,32 @@ class apibot():
         print(last_row, last_index)
         print('--------------------------------------------------------')
 
-        indicators_buy = df.loc[last_index, ['Bollinger_Breakout_Low', 'RSI_Oversold', 'up_trend', 'down_trend']]
-        indicators_sell = df.loc[last_index, ['RSI_Overbought', 'Bollinger_Breakout_High', 'up_trend', 'down_trend']]
+        indicators_buy = df.loc[last_index, ['RSI_Oversold', 'up_trend', 'up_trend']]
+        indicators_MACD = df.loc[last_index, ['RSI_Oversold, 'MACD_Bullish']
+        indicators_sell = df.loc[last_index, ['RSI_Overbought']
 
         order_number = random.randint(1000, 9999)
-        if indicators_buy.any():
+        if indicators_buy.all():
             buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
             buy_order = {'type': 'Bought', 'symbol': last_row['market'],
                                                 'time': str(last_index.to_pydatetime()),
                                                 'closing_price': float(last_row['close']),
-                                                'order': order_number}
+                                                'order': order_number, 'strategy': 'RSI_Oversold, up_trend'}
 
-            print(buy_message)
+      
             print(buy_order)
             self.update_file(self._file_path, buy_order)
+            await self.send_telegram_message(buy_message)
+
+        elif indicators_MACD.all():
+            buy_order = {'type': 'Bought', 'symbol': row['market'],
+                         'time': str(index.to_pydatetime()),
+                         'closing_price': float(row['close']),
+                         'order': order_number, 'strategy': 'MACD_Bullish, RSI_Oversold_MACD'}
+
+            self.update_file(self._file_path, buy_order)
+            buy_orders2.append(buy_order)
+            print(buy_order)
             await self.send_telegram_message(buy_message)
 
         else:
@@ -200,8 +212,9 @@ class apibot():
         #take profit / Stop loss
         if self.load_data(self._file_path) is not None:
             for i in self.load_data(self._file_path):
+                stop_limit = float(i['closing_price'] * 0.92
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                    float(last_row['close']) <= float(i['closing_price']) * 0.95:
+                    float(last_row['close']) <= float(i['closing_price']) * 0.95 >= stop_limit:
 
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
@@ -215,14 +228,14 @@ class apibot():
                                                            'aankoopprijs': float(i['closing_price']),
                                                            'aankoopdatum': str(i['time']),
                                                            'percentage_loss': percentage_loss}
-                    print(stoploss_message)
+        
                     print(stoploss_order)
                     self.update_file(self._file_path, stoploss_order)
                     await self.send_telegram_message(stoploss_message)
 
-                elif indicators_sell.any():
+                elif indicators_sell.all():
                     if i['type'] == 'Bought' and i['symbol'] == last_row['market']:
-                        # float(last_row['close']) >= float(i['closing_price']) * 1.12:
+                        # float(last_row['close']) >= float(i['closing_price']) * 1.15:
 
                         percentage = (float(last_row['close']) - float(i['closing_price'])) / float(i['closing_price']) * 100
                         percentage = format(percentage, ".2f")
@@ -240,7 +253,6 @@ class apibot():
                                        f"percentage gained: {sell_order['percentage_gain']}"
 
                         print(sell_order)
-                        print(sell_message)
                         self.update_file(self._file_path, sell_order)
                         await self.send_telegram_message(sell_message)
 
@@ -254,7 +266,7 @@ class apibot():
 
         # while datetime.now() < end_time:
         for i in self._markets:
-            df = bot.get_bitvavo_data(interval='1h', limit=1440, market=i) #Op 1 of 2h traden geeft meeste winst, tot wel 19% bij Solana
+            df = bot.get_bitvavo_data(interval='1h', limit=1440, market=i) 
             df = bot.add_indicators(df)
             data_complete = bot.generate_signals(df)
             await bot.check_signals(data_complete)
@@ -264,6 +276,7 @@ class apibot():
 if __name__ == '__main__':
     # file_path = 'CryptoOrders.json'
     file_path = os.getenv('FILE_PATH')
-    bot = apibot(file_path=file_path, markets=['SOL-EUR', 'ADA-EUR'])
+    bot = apibot(file_path=file_path, markets=['SOL-EUR', 'ADA-EUR', 'AVAX-EUR', 'ICP-EUR',
+                                               'COTI-EUR', 'JUP-EUR', 'MANTA-EUR', 'CFX-EUR'])
     asyncio.run(bot.main(bot))
 
