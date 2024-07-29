@@ -178,7 +178,7 @@ class apibot():
         print('--------------------------------------------------------')
 
         indicators_buy = df.loc[last_index, ['RSI_Oversold', 'up_trend']]
-        indicators_MACD = df.loc[index, ['MACD_Bullish', 'RSI_Oversold_MACD']]
+        indicators_MACD = df.loc[last_index, ['MACD_Bullish', 'RSI_Oversold_MACD']]
         indicators_sell = df.loc[last_index, ['RSI_Overbought']]
 
         order_number = random.randint(1000, 9999)
@@ -195,13 +195,13 @@ class apibot():
             await self.send_telegram_message(buy_message)
 
         elif indicators_MACD.all():
-            buy_order = {'type': 'Bought', 'symbol': row['market'],
-                         'time': str(index.to_pydatetime()),
-                         'closing_price': float(row['close']),
+            buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
+            buy_order = {'type': 'Bought', 'symbol': last_row['market'],
+                         'time': str(last_index.to_pydatetime()),
+                         'closing_price': float(last_row['close']),
                          'order': order_number, 'strategy': 'MACD_Bullish, RSI_Oversold_MACD'}
 
             self.update_file(self._file_path, buy_order)
-            buy_orders2.append(buy_order)
             print(buy_order)
             await self.send_telegram_message(buy_message)
 
@@ -215,8 +215,9 @@ class apibot():
                 stop_limit = float(i['closing_price'] * 0.92
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
                         float(last_row['close']) <= float(i['closing_price']) * 0.95 >= stop_limit:
+                                                   
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
-                    percentage_loss = format(percentage_loss, ".2f")
+                        percentage_loss = format(percentage_loss, ".2f")
 
                     stoploss_message = f"Stoploss:\n {last_row['market']} prijs: {last_row['close']}\n" \
                                        f"percentage loss: {float(i['closing_price']) / float(last_row['close'])}"
@@ -232,13 +233,12 @@ class apibot():
                     self.update_file(self._file_path, stoploss_order)
                     await self.send_telegram_message(stoploss_message)
 
-                elif indicators_sell.all():
+                elif indicators_sell.all():                                                               
                     if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
                             float(last_row['close']) >= float(i['closing_price']) * 1.15:
-
+                                
                         percentage = (float(last_row['close']) - float(i['closing_price'])) / float(i['closing_price']) * 100
                         percentage = format(percentage, ".2f")
-
                         sell_order = {'type': 'Sold', 'symbol': last_row['market'],
                                                            'order': i['order'],
                                                            'time': str(last_index.to_pydatetime()),
