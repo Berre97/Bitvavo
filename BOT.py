@@ -215,9 +215,9 @@ class apibot():
                 stop_limit = float(i['closing_price'] * 0.92
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
                         float(last_row['close']) <= float(i['closing_price']) * 0.95 >= stop_limit:
-                                                   
+                                         
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
-                        percentage_loss = format(percentage_loss, ".2f")
+                    percentage_loss = format(percentage_loss, ".2f")
 
                     stoploss_message = f"Stoploss:\n {last_row['market']} prijs: {last_row['close']}\n" \
                                        f"percentage loss: {float(i['closing_price']) / float(last_row['close'])}"
