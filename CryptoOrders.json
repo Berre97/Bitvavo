@@ -30,5 +30,13 @@
         "closing_price": 0.98397,
         "order": 3066,
         "strategy": "RSI_Oversold, up_trend"
+    },
+    {
+        "type": "Bought",
+        "symbol": "ICP-EUR",
+        "time": "2024-07-30 04:00:00",
+        "closing_price": 8.3991,
+        "order": 6413,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
