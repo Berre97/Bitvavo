@@ -62,5 +62,13 @@
         "closing_price": 1.006,
         "order": 6740,
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "SOL-EUR",
+        "time": "2024-07-30 15:00:00",
+        "closing_price": 167.52,
+        "order": 6531,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
