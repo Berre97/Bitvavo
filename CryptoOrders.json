@@ -38,5 +38,29 @@
         "closing_price": 8.3991,
         "order": 6413,
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "SOL-EUR",
+        "time": "2024-07-30 13:00:00",
+        "closing_price": 168.13,
+        "order": 4970,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "AVAX-EUR",
+        "time": "2024-07-30 13:00:00",
+        "closing_price": 24.876,
+        "order": 1927,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "JUP-EUR",
+        "time": "2024-07-30 13:00:00",
+        "closing_price": 1.006,
+        "order": 6740,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
