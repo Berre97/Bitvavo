@@ -46,12 +46,15 @@
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "SOL-EUR",
-        "time": "2024-07-30 13:00:00",
-        "closing_price": 168.13,
+        "time": "2024-07-31 22:00:00",
+        "closing_price": 159.62,
         "order": 4970,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 168.13,
+        "aankoopdatum": "2024-07-30 13:00:00",
+        "percentage_loss": "5.06"
     },
     {
         "type": "Stoploss",
