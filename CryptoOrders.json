@@ -1,11 +1,14 @@
 [
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "JUP-EUR",
-        "time": "2024-07-29 23:00:00",
-        "closing_price": 1.012,
+        "time": "2024-07-31 20:00:00",
+        "closing_price": 0.94509,
         "order": 6851,
-        "strategy": "RSI_Oversold, up_trend"
+        "strategy": "RSI_Oversold, up_trend",
+        "aankoopprijs": 1.012,
+        "aankoopdatum": "2024-07-29 23:00:00",
+        "percentage_loss": "6.61"
     },
     {
         "type": "Bought",
@@ -56,12 +59,15 @@
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "JUP-EUR",
-        "time": "2024-07-30 13:00:00",
-        "closing_price": 1.006,
+        "time": "2024-07-31 20:00:00",
+        "closing_price": 0.94509,
         "order": 6740,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 1.006,
+        "aankoopdatum": "2024-07-30 13:00:00",
+        "percentage_loss": "6.05"
     },
     {
         "type": "Bought",
