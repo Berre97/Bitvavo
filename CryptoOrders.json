@@ -30,12 +30,15 @@
         "percentage_loss": "5.28"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "JUP-EUR",
-        "time": "2024-07-30 02:00:00",
-        "closing_price": 0.98397,
+        "time": "2024-07-31 23:00:00",
+        "closing_price": 0.93189,
         "order": 3066,
-        "strategy": "RSI_Oversold, up_trend"
+        "strategy": "RSI_Oversold, up_trend",
+        "aankoopprijs": 0.98397,
+        "aankoopdatum": "2024-07-30 02:00:00",
+        "percentage_loss": "5.29"
     },
     {
         "type": "Bought",
