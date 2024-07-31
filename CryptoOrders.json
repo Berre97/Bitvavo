@@ -78,5 +78,13 @@
         "closing_price": 165.95,
         "order": 2270,
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "AVAX-EUR",
+        "time": "2024-07-31 02:00:00",
+        "closing_price": 24.424,
+        "order": 6103,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
