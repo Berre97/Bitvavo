@@ -19,12 +19,15 @@
         "strategy": "RSI_Oversold, up_trend"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "AVAX-EUR",
-        "time": "2024-07-30 02:00:00",
-        "closing_price": 24.917,
+        "time": "2024-07-31 21:00:00",
+        "closing_price": 23.601,
         "order": 2470,
-        "strategy": "RSI_Oversold, up_trend"
+        "strategy": "RSI_Oversold, up_trend",
+        "aankoopprijs": 24.917,
+        "aankoopdatum": "2024-07-30 02:00:00",
+        "percentage_loss": "5.28"
     },
     {
         "type": "Bought",
@@ -51,12 +54,15 @@
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "AVAX-EUR",
-        "time": "2024-07-30 13:00:00",
-        "closing_price": 24.876,
+        "time": "2024-07-31 21:00:00",
+        "closing_price": 23.601,
         "order": 1927,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 24.876,
+        "aankoopdatum": "2024-07-30 13:00:00",
+        "percentage_loss": "5.13"
     },
     {
         "type": "Stoploss",
