@@ -226,7 +226,7 @@ class apibot():
             self.update_file(self._file_path, buy_order)
             await self.send_telegram_message(buy_message)
 
-        elif indicators_MACD.all() and float(last_row['close']) is_within_support_zone:
+        elif indicators_MACD.all() and is_within_support_zone:
             buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
             buy_order = {'type': 'Bought', 'symbol': last_row['market'],
                          'time': str(last_index.to_pydatetime()),
