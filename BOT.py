@@ -222,7 +222,7 @@ class apibot():
                     percentage_loss = format(percentage_loss, ".2f")
 
                     stoploss_message = f"Stoploss:\n {last_row['market']} prijs: {last_row['close']}\n" \
-                                       f"percentage loss: {float(i['closing_price']) / float(last_row['close'])}"
+                                       f"percentage loss: {percentage_loss}"
 
                     stoploss_order = {'type': 'Stoploss', "symbol": last_row['market'], 'order': i['order'],
                                                            'time': str(last_index.to_pydatetime()),
@@ -251,7 +251,7 @@ class apibot():
 
                         sell_message = f"Verkoop:\n {last_row['market']} prijs: {last_row['close']} " \
                                        f"aankoopkoers: {float(i['closing_price'])}\n " \
-                                       f"percentage gained: {sell_order['percentage_gain']}"
+                                       f"percentage gained: {percentage}"
 
                         print(sell_order)
                         self.update_file(self._file_path, sell_order)
