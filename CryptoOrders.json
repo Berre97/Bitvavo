@@ -44,12 +44,15 @@
         "percentage_loss": "5.29"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "ICP-EUR",
-        "time": "2024-07-30 04:00:00",
-        "closing_price": 8.3991,
+        "time": "2024-08-01 17:00:00",
+        "closing_price": 7.954,
         "order": 6413,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 8.3991,
+        "aankoopdatum": "2024-07-30 04:00:00",
+        "percentage_loss": "5.30"
     },
     {
         "type": "Stoploss",
@@ -126,12 +129,15 @@
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "CFX-EUR",
-        "time": "2024-08-01 04:00:00",
-        "closing_price": 0.14906,
+        "time": "2024-08-01 17:00:00",
+        "closing_price": 0.13913,
         "order": 7087,
-        "strategy": "RSI_Oversold, up_trend"
+        "strategy": "RSI_Oversold, up_trend",
+        "aankoopprijs": 0.14906,
+        "aankoopdatum": "2024-08-01 04:00:00",
+        "percentage_loss": "6.66"
     },
     {
         "type": "Bought",
@@ -142,12 +148,15 @@
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "COTI-EUR",
-        "time": "2024-08-01 09:00:00",
-        "closing_price": 0.09355,
+        "time": "2024-08-01 17:00:00",
+        "closing_price": 0.088603,
         "order": 2865,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 0.09355,
+        "aankoopdatum": "2024-08-01 09:00:00",
+        "percentage_loss": "5.29"
     },
     {
         "type": "Bought",
@@ -158,12 +167,15 @@
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "COTI-EUR",
-        "time": "2024-08-01 09:00:00",
-        "closing_price": 0.093398,
+        "time": "2024-08-01 17:00:00",
+        "closing_price": 0.088603,
         "order": 2542,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 0.093398,
+        "aankoopdatum": "2024-08-01 09:00:00",
+        "percentage_loss": "5.13"
     },
     {
         "type": "Bought",
