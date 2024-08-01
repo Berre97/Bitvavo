@@ -203,7 +203,7 @@ class apibot():
         print(last_row, last_index)
         print('--------------------------------------------------------')
 
-        indicators_buy = df.loc[last_index, ['RSI_Oversold', 'Bollinger_Breakout_Low]]
+        indicators_buy = df.loc[last_index, ['RSI_Oversold', 'Bollinger_Breakout_Low']]
         indicators_MACD = df.loc[last_index, ['MACD_Bullish', 'RSI_Oversold_MACD']]
         indicators_sell = df.loc[last_index, ['RSI_Overbought']]
 
