@@ -132,5 +132,29 @@
         "closing_price": 0.14906,
         "order": 7087,
         "strategy": "RSI_Oversold, up_trend"
+    },
+    {
+        "type": "Bought",
+        "symbol": "ADA-EUR",
+        "time": "2024-08-01 09:00:00",
+        "closing_price": 0.35906,
+        "order": 2783,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "COTI-EUR",
+        "time": "2024-08-01 09:00:00",
+        "closing_price": 0.09355,
+        "order": 2865,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "JUP-EUR",
+        "time": "2024-08-01 09:00:00",
+        "closing_price": 0.91928,
+        "order": 8142,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
