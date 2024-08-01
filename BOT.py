@@ -10,7 +10,6 @@ import asyncio
 from datetime import datetime, timedelta
 import os
 import random
-from scipy.signal import argrelextrema
 
 api_keys= json.loads(os.getenv('API_KEYS'))
 
@@ -82,24 +81,7 @@ class apibot():
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)
 
-    def identify_zones(self, levels, margin=1.5):
-        levels = sorted(levels)
-        zones = []
-        current_zone = []
-    
-        for level in levels:
-            if not current_zone:
-                current_zone.append(level)
-            elif level <= current_zone[-1] * (1 + margin / 100):
-                current_zone.append(level)
-            else:
-                zones.append((min(current_zone), max(current_zone)))
-                current_zone = [level]
-    
-        if current_zone:
-            zones.append((min(current_zone), max(current_zone)))
 
-        return zones
 
     def get_bitvavo_data(self, market, interval, limit):
       response = bitvavo.candles(market, interval, {'limit': limit})
@@ -110,8 +92,6 @@ class apibot():
       data = data.set_index('timestamp')
       data = data.sort_index()
       data['market'] = market
-      data['max'] = data.iloc[argrelextrema(data['close'].values, np.greater_equal, order=3)[0]]['close']
-      data['min'] = data.iloc[argrelextrema(data['close'].values, np.less_equal, order=3)[0]]['close']
 
       return data
 
@@ -191,10 +171,6 @@ class apibot():
 
     # Functie om signalen te controleren
     async def check_signals(self, df):
-        resistance_levels = df['max'].dropna().tolist()
-        support_levels = df['min'].dropna().tolist()
-        resistance_zones = self.identify_zones(resistance_levels)
-        support_zones = self.identify_zones(support_levels)
 
         last_index = df.index[-1]
         last_row = df.iloc[-1]
@@ -203,18 +179,12 @@ class apibot():
         print(last_row, last_index)
         print('--------------------------------------------------------')
 
-        indicators_buy = df.loc[last_index, ['RSI_Oversold', 'Bollinger_Breakout_Low']]
+        indicators_buy = df.loc[last_index, ['RSI_Oversold', 'up_trend']]
         indicators_MACD = df.loc[last_index, ['MACD_Bullish', 'RSI_Oversold_MACD']]
         indicators_sell = df.loc[last_index, ['RSI_Overbought']]
 
         order_number = random.randint(1000, 9999)
-        is_within_support_zone = False
-        for zone in support_zones:
-            if zone[0] <= last_row['close'] <= zone[1]:
-                is_within_support_zone = True
-                break
-                    
-        if indicators_buy.all() and is_within_support_zone:
+        if indicators_buy.all():
             buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
             buy_order = {'type': 'Bought', 'symbol': last_row['market'],
                                                 'time': str(last_index.to_pydatetime()),
@@ -226,7 +196,7 @@ class apibot():
             self.update_file(self._file_path, buy_order)
             await self.send_telegram_message(buy_message)
 
-        elif indicators_MACD.all() and is_within_support_zone:
+        elif indicators_MACD.all():
             buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
             buy_order = {'type': 'Bought', 'symbol': last_row['market'],
                          'time': str(last_index.to_pydatetime()),
