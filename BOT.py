@@ -214,7 +214,7 @@ class apibot():
                 is_within_support_zone = True
                 break
                     
-        if indicators_buy.all() and float(last_row['close']) is_within_support_zone:
+        if indicators_buy.all() and is_within_support_zone:
             buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
             buy_order = {'type': 'Bought', 'symbol': last_row['market'],
                                                 'time': str(last_index.to_pydatetime()),
