@@ -206,12 +206,15 @@
         "percentage_loss": "8.79"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "JUP-EUR",
-        "time": "2024-08-01 20:00:00",
-        "closing_price": 0.89977,
+        "time": "2024-08-02 18:00:00",
+        "closing_price": 0.84781,
         "order": 5261,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 0.89977,
+        "aankoopdatum": "2024-08-01 20:00:00",
+        "percentage_loss": "5.77"
     },
     {
         "type": "Stoploss",
