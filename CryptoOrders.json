@@ -121,12 +121,15 @@
         "percentage_loss": "5.06"
     },
     {
-        "type": "Bought",
+        "type": "Stoploss",
         "symbol": "ICP-EUR",
-        "time": "2024-07-31 03:00:00",
-        "closing_price": 8.1896,
+        "time": "2024-08-02 22:00:00",
+        "closing_price": 7.743,
         "order": 3331,
-        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD",
+        "aankoopprijs": 8.1896,
+        "aankoopdatum": "2024-07-31 03:00:00",
+        "percentage_loss": "5.45"
     },
     {
         "type": "Stoploss",
