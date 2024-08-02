@@ -200,5 +200,13 @@
         "closing_price": 0.89977,
         "order": 5261,
         "strategy": "MACD_Bullish, RSI_Oversold_MACD"
+    },
+    {
+        "type": "Bought",
+        "symbol": "CFX-EUR",
+        "time": "2024-08-02 10:00:00",
+        "closing_price": 0.13982,
+        "order": 9232,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
