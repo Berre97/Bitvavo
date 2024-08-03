@@ -229,5 +229,13 @@
         "aankoopprijs": 0.13982,
         "aankoopdatum": "2024-08-02 10:00:00",
         "percentage_loss": "6.84"
+    },
+    {
+        "type": "Bought",
+        "symbol": "AVAX-EUR",
+        "time": "2024-08-03 04:00:00",
+        "closing_price": 21.712,
+        "order": 8256,
+        "strategy": "MACD_Bullish, RSI_Oversold_MACD"
     }
 ]
