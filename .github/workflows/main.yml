@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "Waiting..."
           Start-Sleep -Seconds 480
-          shell: pwsh
+        shell: pwsh
         
       - name: Run script
         env:
