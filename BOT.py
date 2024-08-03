@@ -108,6 +108,7 @@ class apibot():
 
           df['up_trend'] = np.where(df['SMA_20'] > df['SMA_50'], True, False) #Op SOLANA sma20 over 50 anders evt #200, 50
           df['down_trend'] = np.where(df['SMA_50'] > df['SMA_20'], True, False) #50, 200
+          df['SMA20_Crossover'] = np.where(df['SMA_20'] > df['SMA_50'], True, False)
 
           # RSI Overbought / Oversold
           df['RSI_Overbought'] = np.where(df['RSI'] >= 60, True, False)
@@ -155,7 +156,8 @@ class apibot():
         stoch = ta.momentum.stoch(df['high'], df['low'], df['close'], window=14, smooth_window=3)
         df['Stoch_K'] = stoch
         df['Stoch_D'] = ta.momentum.stoch_signal(df['high'], df['low'], df['close'], window=14, smooth_window=3)
-
+        df['SMA_50_above_SMA_200'] = df[['SMA_20', 'SMA_200']].apply(lambda row: row['SMA_20'] > row['SMA_200'], axis=1)
+        df['SMA_above'] = df['SMA_50_above_SMA_200'].rolling(window=48).sum() == 48
 
         # On Balance Volume (OBV)
         df['OBV'] = ta.volume.on_balance_volume(df['close'], df['volume'])
@@ -179,8 +181,7 @@ class apibot():
         print(last_row, last_index)
         print('--------------------------------------------------------')
 
-        indicators_buy = df.loc[last_index, ['RSI_Oversold', 'up_trend']]
-        indicators_MACD = df.loc[last_index, ['MACD_Bullish', 'RSI_Oversold_MACD']]
+        indicators = df.loc[index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
         indicators_sell = df.loc[last_index, ['RSI_Overbought']]
 
         order_number = random.randint(1000, 9999)
@@ -214,9 +215,9 @@ class apibot():
         #take profit / Stop loss
         if self.load_data(self._file_path) is not None:
             for i in self.load_data(self._file_path):
-                stop_limit = float(i['closing_price']) * 0.92
+                stop_limit = float(i['closing_price']) * 0.96
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                        float(last_row['close']) <= float(i['closing_price']) * 0.95 >= stop_limit:
+                        float(last_row['close']) <= float(i['closing_price']) * 0.97 >= stop_limit:
                                    
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
