@@ -181,7 +181,7 @@ class apibot():
         print(last_row, last_index)
         print('--------------------------------------------------------')
 
-        indicators = df.loc[last_index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
+        indicators_buy = df.loc[last_index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
         indicators_sell = df.loc[last_index, ['RSI_Overbought']]
 
         order_number = random.randint(1000, 9999)
