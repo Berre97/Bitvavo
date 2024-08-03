@@ -197,21 +197,7 @@ class apibot():
             self.update_file(self._file_path, buy_order)
             await self.send_telegram_message(buy_message)
 
-        elif indicators_MACD.all():
-            buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
-            buy_order = {'type': 'Bought', 'symbol': last_row['market'],
-                         'time': str(last_index.to_pydatetime()),
-                         'closing_price': float(last_row['close']),
-                         'order': order_number, 'strategy': 'MACD_Bullish, RSI_Oversold_MACD'}
-
-            self.update_file(self._file_path, buy_order)
-            print(buy_order)
-            await self.send_telegram_message(buy_message)
-
-        else:
-          print('Geen koopsignalen gevonden')
-
-
+        
         #take profit / Stop loss
         if self.load_data(self._file_path) is not None:
             for i in self.load_data(self._file_path):
