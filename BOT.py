@@ -109,6 +109,7 @@ class apibot():
           df['up_trend'] = np.where(df['SMA_20'] > df['SMA_50'], True, False) #Op SOLANA sma20 over 50 anders evt #200, 50
           df['down_trend'] = np.where(df['SMA_50'] > df['SMA_20'], True, False) #50, 200
           df['SMA20_Crossover'] = np.where(df['SMA_20'] > df['SMA_50'], True, False)
+          df['SMA50_Crossover'] = np.where(df['SMA_20'] < df['SMA_50'], True, False)
 
           # RSI Overbought / Oversold
           df['RSI_Overbought'] = np.where(df['RSI'] >= 60, True, False)
@@ -119,8 +120,11 @@ class apibot():
           # MACD Crossovers
           df['MACD_Bullish'] = np.where((df['MACD'] > df['MACD_signal']) & (df['MACD'].shift(1) <= df['MACD_signal'].shift(1)), True, False)
           df['MACD_Bearish'] = np.where((df['MACD'] < df['MACD_signal']) & (df['MACD'].shift(1) >= df['MACD_signal'].shift(1)), True, False)
-
-
+            
+          df['Bullish'] = np.where(df['SMA_20'] > df['SMA_200'], True, False)
+          df['Bearish'] = np.where(df['SMA_200'] > df['SMA_20'], True, False
+      
+          
           # Bollinger Bands Cross
           df['Bollinger_Breakout_High'] = np.where((df['close'] > df['Bollinger_High']), True, False)
           df['Bollinger_Breakout_Low'] = np.where((df['close'] < df['Bollinger_Low']), True, False)
@@ -173,7 +177,6 @@ class apibot():
 
     # Functie om signalen te controleren
     async def check_signals(self, df):
-
         last_index = df.index[-1]
         last_row = df.iloc[-1]
 
@@ -181,16 +184,19 @@ class apibot():
         print(last_row, last_index)
         print('--------------------------------------------------------')
 
-        indicators_buy = df.loc[last_index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
-        indicators_sell = df.loc[last_index, ['RSI_Overbought']]
-
+        
         order_number = random.randint(1000, 9999)
-        if indicators_buy.all():
-            buy_message = f"Koop:\n {last_row['market']} {last_row['close']}"
-            buy_order = {'type': 'Bought', 'symbol': last_row['market'],
-                                                'time': str(last_index.to_pydatetime()),
-                                                'closing_price': float(last_row['close']),
-                                                'order': order_number, 'strategy': 'RSI_Oversold, up_trend'}
+        
+        #Going long
+        if df.loc[index, ['Bullish']].all():
+            indicators_buy = df.loc[last_index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
+            indicators_sell = df.loc[last_index, ['RSI_Overbought']]
+            if indicators_buy.all():
+                buy_message = f"Koop:\n Positie: Long {last_row['market']} {last_row['close']}"
+                buy_order = {'type': 'Bought', 'strategy': 'Long', 'symbol': last_row['market'],
+                                                    'time': str(last_index.to_pydatetime()),
+                                                    'closing_price': float(last_row['close']),
+                                                    'order': order_number, 'strategy': 'RSI_Oversold, up_trend'}
 
       
             print(buy_order)
@@ -203,12 +209,12 @@ class apibot():
             for i in self.load_data(self._file_path):
                 stop_limit = float(i['closing_price']) * 0.96
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                        float(last_row['close']) <= float(i['closing_price']) * 0.97 >= stop_limit:
+                        float(last_row['close']) <= float(i['closing_price']) * 0.97 >= stop_limit and i['strategy'] == 'Long':
                                    
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
 
-                    stoploss_message = f"Stoploss:\n {last_row['market']} prijs: {last_row['close']}\n" \
+                    stoploss_message = f"Stoploss:\n Positie: Long {last_row['market']} prijs: {last_row['close']}\n" \
                                        f"percentage loss: {percentage_loss}"
 
                     stoploss_order = {'type': 'Stoploss', "symbol": last_row['market'], 'order': i['order'],
@@ -224,9 +230,76 @@ class apibot():
 
                 elif indicators_sell.all():                                                               
                     if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                            float(last_row['close']) >= float(i['closing_price']) * 1.15:
+                            float(last_row['close']) >= float(i['closing_price']) * 1.10 and \
+                            i['strategy'] == 'Long':
                                 
                         percentage = (float(last_row['close']) - float(i['closing_price'])) / float(i['closing_price']) * 100
+                        percentage = format(percentage, ".2f")
+                        sell_order = {'type': 'Sold', 'symbol': last_row['market'],
+                                                           'order': i['order'],
+                                                           'time': str(last_index.to_pydatetime()),
+                                                           'closing_price': float(last_row['close']),
+                                                           'aankoopprijs': float(i['closing_price']),
+                                                           'aankoopdatum': str(i['time']),
+                                                           'percentage_gain': percentage}
+
+                        sell_message = f"Verkoop:\n {last_row['market']} prijs: {last_row['close']} " \
+                                       f"aankoopkoers: {float(i['closing_price'])}\n " \
+                                       f"percentage gained: {percentage}"
+
+                        print(sell_order)
+                        self.update_file(self._file_path, sell_order)
+                        await self.send_telegram_message(sell_message)
+
+        
+
+        #Going short
+        if df.loc[index, ['Bearish']].all():
+            indicators_buy = df.loc[last_index, ['SMA50_Crossover', 'SMA_below', 'Bollinger_Breakout_High']]
+            indicators_sell = df.loc[last_index, ['Bollinger_Breakout_Low']]
+            if indicators_buy.all():
+                buy_message = f"Koop:\n Positie: Short {last_row['market']} {last_row['close']}"
+                buy_order = {'type': 'Bought', 'strategy': 'Short', 'symbol': last_row['market'],
+                                                    'time': str(last_index.to_pydatetime()),
+                                                    'closing_price': float(last_row['close']),
+                                                    'order': order_number, 'strategy': 'RSI_Oversold, up_trend'}
+
+      
+            print(buy_order)
+            self.update_file(self._file_path, buy_order)
+            await self.send_telegram_message(buy_message)
+
+        
+        #take profit / Stop loss
+        if self.load_data(self._file_path) is not None:
+            for i in self.load_data(self._file_path):
+                stop_limit = float(i['closing_price']) * 1.06
+                if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
+                        float(last_row['close']) >= float(i['closing_price']) * 1.04 <= stop_limit and i['strategy'] == 'Short':
+                                   
+                    percentage_loss = (float(last_row['close']) - float(i['closing_price'])) * 100 / float(i['closing_price'])
+                    percentage_loss = format(percentage_loss, ".2f")
+
+                    stoploss_message = f"Stoploss:\n Positie: Short {last_row['market']} prijs: {last_row['close']}\n" \
+                                       f"percentage loss: {percentage_loss}"
+
+                    stoploss_order = {'type': 'Stoploss', "symbol": last_row['market'], 'order': i['order'],
+                                                           'time': str(last_index.to_pydatetime()),
+                                                           'closing_price': float(last_row['close']),
+                                                           'aankoopprijs': float(i['closing_price']),
+                                                           'aankoopdatum': str(i['time']),
+                                                           'percentage_loss': percentage_loss}
+        
+                    print(stoploss_order)
+                    self.update_file(self._file_path, stoploss_order)
+                    await self.send_telegram_message(stoploss_message)
+
+                elif indicators_sell.all():                                                               
+                    if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
+                            float(last_row['close']) >= float(i['closing_price']) * 1.10 and \
+                            i['strategy'] == 'Short':
+                                
+                        percentage = (float(i['closing_price']) - float(last_row['close'])) / float(i['closing_price']) * 100
                         percentage = format(percentage, ".2f")
                         sell_order = {'type': 'Sold', 'symbol': last_row['market'],
                                                            'order': i['order'],
