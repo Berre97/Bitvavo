@@ -188,7 +188,7 @@ class apibot():
         order_number = random.randint(1000, 9999)
         
         #Going long
-        if df.loc[index, ['Bullish']].all():
+        if df.loc[last_index, ['Bullish']].all():
             indicators_buy = df.loc[last_index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
             indicators_sell = df.loc[last_index, ['RSI_Overbought']]
             if indicators_buy.all():
@@ -254,7 +254,7 @@ class apibot():
         
 
         #Going short
-        if df.loc[index, ['Bearish']].all():
+        if df.loc[last_index, ['Bearish']].all():
             indicators_buy = df.loc[last_index, ['SMA50_Crossover', 'SMA_below', 'Bollinger_Breakout_High']]
             indicators_sell = df.loc[last_index, ['Bollinger_Breakout_Low']]
             if indicators_buy.all():
