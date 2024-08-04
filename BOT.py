@@ -268,9 +268,9 @@ class apibot():
                                                     'order': order_number, 'strategy': 'RSI_Oversold, up_trend'}
 
       
-            print(buy_order)
-            self.update_file(self._file_path, buy_order)
-            await self.send_telegram_message(buy_message)
+                print(buy_order)
+                self.update_file(self._file_path, buy_order)
+                await self.send_telegram_message(buy_message)
 
         
         #take profit / Stop loss
@@ -279,7 +279,7 @@ class apibot():
                 stop_limit = float(i['closing_price']) * 1.06
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
                         float(last_row['close']) >= float(i['closing_price']) * 1.04 <= stop_limit and i['strategy'] == 'Short':
-                                   
+                                    
                     percentage_loss = (float(last_row['close']) - float(i['closing_price'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
 
