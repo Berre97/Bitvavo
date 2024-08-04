@@ -122,7 +122,7 @@ class apibot():
           df['MACD_Bearish'] = np.where((df['MACD'] < df['MACD_signal']) & (df['MACD'].shift(1) >= df['MACD_signal'].shift(1)), True, False)
             
           df['Bullish'] = np.where(df['SMA_20'] > df['SMA_200'], True, False)
-          df['Bearish'] = np.where(df['SMA_200'] > df['SMA_20'], True, False
+          df['Bearish'] = np.where(df['SMA_200'] > df['SMA_20'], True, False)
       
           
           # Bollinger Bands Cross
