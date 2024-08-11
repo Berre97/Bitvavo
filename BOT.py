@@ -194,7 +194,7 @@ class apibot():
         #Long_Bullish
         if df.loc[last_index, ['Bullish']].all():
             if indicators_buybullish.all():
-                buy_message = f"Koop:\n Positie: Long {last_row['market']} {last_row['close']}"
+                buy_message = f"Koop:\n Bullish {last_row['market']} {last_row['close']}"
                 buy_order = {'type': 'Bought', 'strategy': 'Long_bullish', 'symbol': last_row['market'],
                                                     'time': str(last_index.to_pydatetime()),
                                                     'closing_price': float(last_row['close']),
@@ -216,7 +216,7 @@ class apibot():
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
 
-                    stoploss_message = f"Stoploss:\n Positie: Long {last_row['market']} prijs: {last_row['close']}\n" \
+                    stoploss_message = f"Stoploss:\n {last_row['market']} prijs: {last_row['close']}\n" \
                                        f"percentage loss: {percentage_loss}"
 
                     stoploss_order = {'type': 'Stoploss', "symbol": last_row['market'], 'order': i['order'],
@@ -245,7 +245,7 @@ class apibot():
                                                            'aankoopdatum': str(i['time']),
                                                            'percentage_gain': percentage}
 
-                        sell_message = f"Verkoop:\n {last_row['market']} prijs: {last_row['close']} " \
+                        sell_message = f"Verkoop:\n Bullish {last_row['market']} prijs: {last_row['close']} " \
                                        f"aankoopkoers: {float(i['closing_price'])}\n " \
                                        f"percentage gained: {percentage}"
 
@@ -258,7 +258,7 @@ class apibot():
         #Long_bearish
         if df.loc[last_index, ['Bearish']].all():
             if indicators_buybearish.all():
-                buy_message = f"Koop:\n Positie: Short {last_row['market']} {last_row['close']}"
+                buy_message = f"Koop:\n Bearish {last_row['market']} {last_row['close']}"
                 buy_order = {'type': 'Bought', 'strategy': 'Long_bearish', 'symbol': last_row['market'],
                                                     'time': str(last_index.to_pydatetime()),
                                                     'closing_price': float(last_row['close']),
@@ -309,7 +309,7 @@ class apibot():
                                                            'aankoopdatum': str(i['time']),
                                                            'percentage_gain': percentage}
 
-                        sell_message = f"Verkoop:\n {last_row['market']} prijs: {last_row['close']} " \
+                        sell_message = f"Verkoop:\n Bearish {last_row['market']} prijs: {last_row['close']} " \
                                        f"aankoopkoers: {float(i['closing_price'])}\n " \
                                        f"percentage gained: {percentage}"
 
