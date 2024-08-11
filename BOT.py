@@ -199,9 +199,9 @@ class apibot():
                                                     'order': order_number}
 
       
-            print(buy_order)
-            self.update_file(self._file_path, buy_order)
-            await self.send_telegram_message(buy_message)
+                print(buy_order)
+                self.update_file(self._file_path, buy_order)
+                await self.send_telegram_message(buy_message)
 
         
         #take profit / Stop loss
