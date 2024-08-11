@@ -1,0 +1,10 @@
+[
+    {
+        "type": "Bought",
+        "strategy": "Long_bullish",
+        "symbol": "SOL-EUR",
+        "time": "2024-08-11 15:00:00",
+        "closing_price": 136.55,
+        "order": 4537
+    }
+]
