@@ -6,5 +6,13 @@
         "time": "2024-08-11 15:00:00",
         "closing_price": 136.55,
         "order": 4537
+    },
+    {
+        "type": "Bought",
+        "strategy": "Long_bearish",
+        "symbol": "ICP-EUR",
+        "time": "2024-08-13 10:00:00",
+        "closing_price": 6.381,
+        "order": 4811
     }
 ]
