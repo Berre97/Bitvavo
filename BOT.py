@@ -274,7 +274,7 @@ class apibot():
         if self.load_data(self._file_path) is not None:
             for i in self.load_data(self._file_path):
                 if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                        float(last_row['close']) <= float(i['closing_price']) * 0.97 and i['strategy'] == 'Long_bearish':
+                        float(last_row['close']) <= float(i['closing_price']) * 0.98 and i['strategy'] == 'Long_bearish':
                                     
                     percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
                     percentage_loss = format(percentage_loss, ".2f")
@@ -295,7 +295,7 @@ class apibot():
 
                 elif indicators_sellbearish.all():                                                               
                     if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                            float(last_row['close']) >= float(i['closing_price']) * 1.045 and \
+                            float(last_row['close']) >= float(i['closing_price']) * 1.04 and \
                             i['strategy'] == 'Long_bearish':
                                 
                         percentage = (float(i['closing_price']) - float(last_row['close'])) / float(i['closing_price']) * 100
