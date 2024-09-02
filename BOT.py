@@ -69,6 +69,14 @@ class apibot():
                 if i['order'] == order['order']:
                     i.update(order)
 
+        elif order['type'] == 'Bought':
+            if 'last_update' in order.keys():
+                for i in data:
+                    if order['order'] == i['order']:
+                        i.update(order)
+            else:
+                data.append(order)
+
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)
 
