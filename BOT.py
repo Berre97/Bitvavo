@@ -1,33 +1,31 @@
-
-from python_bitvavo_api.bitvavo import Bitvavo
+import os
 import json
+import random
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import time
 import ta
 from telegram import Bot
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
-import random
+import yfinance as yf
+import re
+import requests
+from bs4 import BeautifulSoup
+from itertools import pairwise
 
-api_keys= json.loads(os.getenv('API_KEYS'))
 
-bitvavo = Bitvavo({
-    'APIKEY': api_keys['API_KEY'],
-    'APISECRET': api_keys['APISECRET'],
-    'RESTURL': api_keys['RESTURL'],
-    'WSURL': api_keys['WSURL']
-})
-
-token = Bot(token=api_keys['token'])
-chat_id = api_keys["chat_id"]
-
+token = Bot(token='7277331559:AAGtyCZcKJ2UI80U6sqJo5jcjQrHD2BXlB8')
+chat_id = -1002203456191
 
 class apibot():
-    def __init__(self, file_path, markets):
+    def __init__(self, file_path_assets, file_path_data, markets):
+        self._file_path_assets = file_path_assets
+        self._file_path_data = file_path_data
         self._markets = markets
-        self._file_path = file_path
+        self._list = []
 
 
     async def send_telegram_message(self, message):
@@ -37,33 +35,29 @@ class apibot():
         print("Failed to send message due to timeout.")
 
 
-    def load_data(self, file_path):
+    def load_assets(self, file_path):
         if os.path.exists(file_path):
             try:
                 with open(file_path, 'r') as f:
                     data = json.load(f)
-
                 return data
             except (json.JSONDecodeError, KeyError, TypeError) as e:
                 print('Error loading json data: {e}')
-                return []
+                return {}
 
 
-    def update_file(self, file_path, order):
+    def update_assets(self, file_path, order):
+
         if os.path.exists(file_path):
             try:
                 with open(file_path, 'r') as f:
                     data = json.load(f)
-                    print(data)
-
-                    if not isinstance(data, list):
-                        data = []
 
             except json.JSONDecodeError:
-                data = []
+                # Als er een decodeerfout is, initialiseert een lege dictionary
+                data = {}
         else:
-            data = []
-
+            data = {}
 
         if order['type'] == "Sold":
             for i in data:
@@ -75,268 +69,278 @@ class apibot():
                 if i['order'] == order['order']:
                     i.update(order)
 
-        else:
-            data.append(order)
-
         with open(file_path, 'w') as f:
             json.dump(data, f, indent=4)
 
 
+    def load_data(self, file_path):
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                return data
+            except (json.JSONDecodeError, KeyError, TypeError) as e:
+                print('Error loading json data: {e}')
+                return {}
 
-    def get_bitvavo_data(self, market, interval, limit):
-      response = bitvavo.candles(market, interval, {'limit': limit})
-      data = pd.DataFrame(response, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-      data = data.drop(data.index[500:])
-      data['timestamp'] = pd.to_datetime(data['timestamp'], unit='ms')
-      data[['open', 'high', 'low', 'close', 'volume']] = data[['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
-      data = data.set_index('timestamp')
-      data = data.sort_index()
-      data['market'] = market
 
-      return data
+    def update_data(self, file_path, order):
 
-    def generate_signals(self, df):
-      for col in df.columns:
-        if df[col].isnull().any():
-          print('Nog niet genoeg data')
-          break
+        if os.path.exists(file_path):
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                    if not isinstance(data, list):
+                        data = []
 
+            except json.JSONDecodeError:
+                # Als er een decodeerfout is, initialiseert een lege dictionary
+                data = []
         else:
-          # Golden Cross / Death Cross
-          df['Golden_Cross'] = np.where((df['SMA_50'] > df['SMA_200']) & (df['SMA_50'].shift(1) <= df['SMA_200'].shift(1)), True, False)
-          df['Death_Cross'] = np.where((df['SMA_50'] < df['SMA_200']) & (df['SMA_50'].shift(1) >= df['SMA_200'].shift(1)), True, False)
+            data = []
 
-          df['SMA20_Crossover'] = np.where(df['SMA_20'] > df['SMA_50'], True, False)
-          df['SMA50_Crossover'] = np.where(df['SMA_20'] < df['SMA_50'], True, False)
+        data.append(order)
 
-          # RSI Overbought / Oversold
-          df['RSI_Overbought'] = np.where(df['RSI'] >= 60, True, False)
-          df['RSI_Oversold'] = np.where(df['RSI'] <= 40, True, False)
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=4)
 
-            
-          # MACD Crossovers
-          df['MACD_Bullish'] = np.where((df['MACD'] > df['MACD_signal']) & (df['MACD'].shift(1) <= df['MACD_signal'].shift(1)), True, False)
-          df['MACD_Bearish'] = np.where((df['MACD'] < df['MACD_signal']) & (df['MACD'].shift(1) >= df['MACD_signal'].shift(1)), True, False)
-          df['RSI_Overbought_MACD'] = np.where(df['RSI'] >= 65, True, False)
-          df['RSI_Oversold_MACD'] = np.where(df['RSI'] <= 45, True, False)
-            
-          df['Bullish'] = np.where(df['SMA_20'] > df['SMA_200'], True, False)
-          df['Bearish'] = np.where(df['SMA_200'] > df['SMA_20'], True, False)
-      
-          # Bollinger Bands Cross
-          df['Bollinger_Breakout_High'] = np.where((df['close'] > df['Bollinger_High']), True, False)
-          df['Bollinger_Breakout_Low'] = np.where((df['close'] < df['Bollinger_Low']), True, False)
+    def plot_data(self, df):
 
-          return df
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), gridspec_kw={'height_ratios': [3, 1]})
+        ax1.plot(df.index, df['Close'], label='Close Price')
+        ax1.plot(df.index, df['EMA_8'], label='EMA 8')
+        ax1.plot(df.index, df['EMA_13'], label='EMA 13')
+        ax1.plot(df.index, df['EMA_21'], label='EMA 21')
+        ax1.plot(df.index, df['EMA_55'], label='EMA 55')
 
-    def add_indicators(self, df):
-        # Beweeglijke gemiddelden
+        ax1.set_title(f'{"Stock"} Price and SMAs')
+        ax1.legend()
 
-        df['SMA_50'] = ta.trend.sma_indicator(df['close'], window=50)
-        df['SMA_20'] = ta.trend.sma_indicator(df['close'], window=20)
-        df['SMA_200'] = ta.trend.sma_indicator(df['close'], window=200)
-        df['EMA_50'] = ta.trend.ema_indicator(df['close'], window=50)
-        df['EMA_200'] = ta.trend.ema_indicator(df['close'], window=200)
+        # Plot RSI op de tweede subplot
+        ax2.plot(df.index, df['RSI'], label='RSI', color='orange')
+        ax2.axhline(70, linestyle='--', alpha=0.5, color='red')
+        ax2.axhline(30, linestyle='--', alpha=0.5, color='green')
+        ax2.set_title('RSI')
+        ax2.legend()
+
+        plt.tight_layout()
+        plt.show()
+
+
+    async def get_data(self, market):
+
+        url = f'https://finance.yahoo.com/quote/{market}/'
+        page = requests.get(url)
+        soup = BeautifulSoup(page.text, 'html.parser')
+        response = yf.download(market, period='1y')
+
+        df = response.sort_index()
+        df['SMA_50'] = ta.trend.sma_indicator(df['Close'], window=50)
+        df['SMA_20'] = ta.trend.sma_indicator(df['Close'], window=20)
+        df['SMA_200'] = ta.trend.sma_indicator(df['Close'], window=200)
 
         # Relatieve sterkte-index (RSI)
-        df['RSI'] = ta.momentum.rsi(df['close'], window=14)
+        df['RSI'] = ta.momentum.rsi(df['Close'], window=14)
 
         # Moving Average Convergence Divergence (MACD)
-        df['MACD'] = ta.trend.macd(df['close'])
-        df['MACD_signal'] = ta.trend.macd_signal(df['close'])
+        df['MACD'] = ta.trend.macd(df['Close'])
+        df['MACD_signal'] = ta.trend.macd_signal(df['Close'])
 
         # Bollinger Bands
-        bollinger = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
+        bollinger = ta.volatility.BollingerBands(df['Close'], window=20, window_dev=2)
         df['Bollinger_High'] = bollinger.bollinger_hband()
         df['Bollinger_Low'] = bollinger.bollinger_lband()
 
-        # Commodity Channel Index (CCI)
-        df['CCI'] = ta.trend.cci(df['high'], df['low'], df['close'], window=20)
+        df['EMA_8'] = ta.trend.ema_indicator(df['Close'], window=8)
+        df['EMA_13'] = ta.trend.ema_indicator(df['Close'], window=13)
+        df['EMA_21'] = ta.trend.ema_indicator(df['Close'], window=21)
+        df['EMA_55'] = ta.trend.ema_indicator(df['Close'], window=55)
 
-        # Stochastische Oscillator
-        stoch = ta.momentum.stoch(df['high'], df['low'], df['close'], window=14, smooth_window=3)
-        df['Stoch_K'] = stoch
-        df['Stoch_D'] = ta.momentum.stoch_signal(df['high'], df['low'], df['close'], window=14, smooth_window=3)
-        df['SMA_20_above_SMA_200'] = df[['SMA_20', 'SMA_200']].apply(lambda row: row['SMA_20'] > row['SMA_200'], axis=1)
-        df['SMA_above'] = df['SMA_20_above_SMA_200'].rolling(window=72).sum() == 72
-        
-        df['SMA_200_above_SMA_20'] = df[['SMA_20', 'SMA_200']].apply(lambda row: row['SMA_20'] < row['SMA_200'], axis=1)
-        df['SMA_below'] = df['SMA_200_above_SMA_20'].rolling(window=72).sum() == 72
+        df['EMA_8_above_EMA_13'] = df['EMA_8'] > df['EMA_13']
+        df['EMA_13_above_EMA_21'] = df['EMA_13'] > df['EMA_21']
+        df['EMA_21_above_EMA_55'] = df['EMA_21'] > df['EMA_55']
 
-        # On Balance Volume (OBV)
-        df['OBV'] = ta.volume.on_balance_volume(df['close'], df['volume'])
+        df['EMA_above'] = (df['EMA_8_above_EMA_13'] &
+                           df['EMA_13_above_EMA_21'] &
+                           df['EMA_21_above_EMA_55']).rolling(window=20).sum() == 20
 
-        # Ichimoku Cloud
-        ichimoku = ta.trend.IchimokuIndicator(df['high'], df['low'], window1=9, window2=26, window3=52)
-        df['Ichimoku_Conversion'] = ichimoku.ichimoku_conversion_line()
-        df['Ichimoku_Base'] = ichimoku.ichimoku_base_line()
-        df['Ichimoku_A'] = ichimoku.ichimoku_a()
-        df['Ichimoku_B'] = ichimoku.ichimoku_b()
+        df['EMA_below'] = (~df['EMA_8_above_EMA_13'] &
+                           ~df['EMA_13_above_EMA_21'] &
+                           ~df['EMA_21_above_EMA_55']).rolling(window=20).sum() == 20
 
-        return df
+        df['volume_MA'] = df['Volume'].rolling(window=20).mean()
+        df['Buy Signal Long'] = df['EMA_above']
+        df['Buy Signal Short'] = df['EMA_below']
 
-    # Functie om signalen te controleren
-    async def check_signals(self, df):
         last_index = df.index[-1]
         last_row = df.iloc[-1]
 
-        print("Laatste data:")
-        print(last_row, last_index)
-        print('--------------------------------------------------------')
+        # Going long
+        indicators_buy_long = df.loc[last_index, ['Buy Signal Long']]
 
-        
-        order_number = random.randint(1000, 9999)
-        indicators_buybullish = df.loc[last_index, ['SMA20_Crossover', 'SMA_above', 'Bollinger_Breakout_Low']]
-        indicators_sellbullish = df.loc[last_index, ['RSI_Overbought']]
-        indicators_buybearish = df.loc[last_index, ['SMA20_Crossover', 'SMA_below', 'RSI_Oversold']]
-        indicators_sellbearish = df.loc[last_index, ['RSI_Overbought']]
-        
-        #Long_Bullish
-        if df.loc[last_index, ['Bullish']].all():
-            if indicators_buybullish.all():
-                buy_message = f"Koop:\n Bullish {last_row['market']} {last_row['close']}"
-                buy_order = {'type': 'Bought', 'strategy': 'Long_bullish', 'symbol': last_row['market'],
-                                                    'time': str(last_index.to_pydatetime()),
-                                                    'closing_price': float(last_row['close']),
-                                                    'order': order_number}
+        for col in df.columns:
+            if df[col].isnull().any():
+                pass
 
-      
-                print(buy_order)
-                self.update_file(self._file_path, buy_order)
-                await self.send_telegram_message(buy_message)
+            else:
+                # Golden Cross / Death Cross
 
-        
-        #take profit / Stop loss
-        if self.load_data(self._file_path) is not None:
-            for i in self.load_data(self._file_path):
-                stop_limit = float(i['closing_price']) * 0.96
-                if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                        float(last_row['close']) <= float(i['closing_price']) * 0.97 >= stop_limit and i['strategy'] == 'Long':
-                                   
-                    percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
-                    percentage_loss = format(percentage_loss, ".2f")
+                # RSI Overbought / Oversold
+                df['RSI_Overbought'] = np.where(df['RSI'] >= 40, True, False)
+                df['RSI_Oversold'] = np.where(df['RSI'] <= 35, True, False)
+                df['Bollinger_Breakout_High'] = np.where((df['Close'] > df['Bollinger_High']), True, False)
+                df['Bollinger_Breakout_Low'] = np.where((df['Close'] < df['Bollinger_Low']), True, False)
+                df['Market'] = market
 
-                    stoploss_message = f"Stoploss:\n {last_row['market']} prijs: {last_row['close']}\n" \
-                                       f"percentage loss: {percentage_loss}"
+                short_ema = df['Close'].ewm(span=12, adjust=False).mean()
+                long_ema = df['Close'].ewm(span=26, adjust=False).mean()
+                df['MACD'] = short_ema - long_ema
+                df['Signal Line'] = df['MACD'].ewm(span=9, adjust=False).mean()
 
-                    stoploss_order = {'type': 'Stoploss', "symbol": last_row['market'], 'order': i['order'],
-                                                           'time': str(last_index.to_pydatetime()),
-                                                           'closing_price': float(last_row['close']),
-                                                           'aankoopprijs': float(i['closing_price']),
-                                                           'aankoopdatum': str(i['time']),
-                                                           'percentage_loss': percentage_loss}
-        
-                    print(stoploss_order)
-                    self.update_file(self._file_path, stoploss_order)
-                    await self.send_telegram_message(stoploss_message)
+                # MACD Crossovers
+                df['MACD_Bullish'] = np.where(
+                    (df['MACD'] > df['Signal Line']) & (df['MACD'].shift(1) <= df['Signal Line'].shift(1)), True,
+                    False)
+                df['MACD_Bearish'] = np.where(
+                    (df['MACD'] < df['Signal Line']) & (df['MACD'].shift(1) >= df['Signal Line'].shift(1)), True,
+                    False)
 
-                elif indicators_sellbullish.all():                                                               
-                    if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                            float(last_row['close']) >= float(i['closing_price']) * 1.10 and \
-                            i['strategy'] == 'Long_bullish':
-                                
-                        percentage = (float(last_row['close']) - float(i['closing_price'])) / float(i['closing_price']) * 100
-                        percentage = format(percentage, ".2f")
-                        sell_order = {'type': 'Sold', 'symbol': last_row['market'],
-                                                           'order': i['order'],
-                                                           'time': str(last_index.to_pydatetime()),
-                                                           'closing_price': float(last_row['close']),
-                                                           'aankoopprijs': float(i['closing_price']),
-                                                           'aankoopdatum': str(i['time']),
-                                                           'percentage_gain': percentage}
+        if page.status_code == 200:
 
-                        sell_message = f"Verkoop:\n Bullish {last_row['market']} prijs: {last_row['close']} " \
-                                       f"aankoopkoers: {float(i['closing_price'])}\n " \
-                                       f"percentage gained: {percentage}"
+            values = soup.find_all('span', class_='value yf-tx3nkj')
+            valuation_measures = soup.find_all('p', class_="value yf-1n4vnw8")
+            fin_highlights = soup.find_all('p', class_="value yf-lc8fp0")
+            current_price = soup.find('fin-streamer', class_="livePrice yf-mgkamr")
+            current_price = current_price.text.strip()
 
-                        print(sell_order)
-                        self.update_file(self._file_path, sell_order)
-                        await self.send_telegram_message(sell_message)
 
-        
+            metric_values = []
+            # Loop door de gevonden elementen en print de tekstinhoud
+            for value in values:
+                value = value.text.strip()
+                metric_values.append(value)
 
-        #Long_bearish
-        if df.loc[last_index, ['Bearish']].all():
-            if indicators_buybearish.all():
-                buy_message = f"Koop:\n Bearish {last_row['market']} {last_row['close']}"
-                buy_order = {'type': 'Bought', 'strategy': 'Long_bearish', 'symbol': last_row['market'],
-                                                    'time': str(last_index.to_pydatetime()),
-                                                    'closing_price': float(last_row['close']),
-                                                    'order': order_number}
+            for i in valuation_measures:
+                value = i.text.strip()
+                metric_values.append(value)
 
-      
-                print(buy_order)
-                self.update_file(self._file_path, buy_order)
-                await self.send_telegram_message(buy_message)
+            for i in fin_highlights:
+                value = i.text.strip()
+                metric_values.append(value)
 
-        
-        #take profit / Stop loss
-        if self.load_data(self._file_path) is not None:
-            for i in self.load_data(self._file_path):
-                if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                        float(last_row['close']) <= float(i['closing_price']) * 0.98 and i['strategy'] == 'Long_bearish':
-                                    
-                    percentage_loss = (float(i['closing_price']) - float(last_row['close'])) * 100 / float(i['closing_price'])
-                    percentage_loss = format(percentage_loss, ".2f")
+            for index, value in enumerate(metric_values):
+                if value == "--":
+                    metric_values[index] = "0"
+                elif value == None:
+                    metric_values[index] = "0"
 
-                    stoploss_message = f"Stoploss:\n Positie: Long_bearish {last_row['market']} prijs: {last_row['close']}\n" \
-                                       f"percentage loss: {percentage_loss}"
+            market_cap = metric_values[8]
+            pe_ratio_ttm = metric_values[10]
+            eps_ttm = metric_values[11]
+            forward_div_yield = metric_values[13]
+            trailing_pe = metric_values[18]
+            forward_pe = metric_values[19]
 
-                    stoploss_order = {'type': 'Stoploss', "symbol": last_row['market'], 'order': i['order'],
-                                                           'time': str(last_index.to_pydatetime()),
-                                                           'closing_price': float(last_row['close']),
-                                                           'aankoopprijs': float(i['closing_price']),
-                                                           'aankoopdatum': str(i['time']),
-                                                           'percentage_loss': percentage_loss}
-        
-                    print(stoploss_order)
-                    self.update_file(self._file_path, stoploss_order)
-                    await self.send_telegram_message(stoploss_message)
+            peg_ratio_5yr = metric_values[20]
+            roa_ttm = metric_values[26]
+            roe_ttm = metric_values[27]
 
-                elif indicators_sellbearish.all():                                                               
-                    if i['type'] == 'Bought' and i['symbol'] == last_row['market'] and \
-                            float(last_row['close']) >= float(i['closing_price']) * 1.04 and \
-                            i['strategy'] == 'Long_bearish':
-                                
-                        percentage = (float(i['closing_price']) - float(last_row['close'])) / float(i['closing_price']) * 100
-                        percentage = format(percentage, ".2f")
-                        sell_order = {'type': 'Sold', 'symbol': last_row['market'],
-                                                           'order': i['order'],
-                                                           'time': str(last_index.to_pydatetime()),
-                                                           'closing_price': float(last_row['close']),
-                                                           'aankoopprijs': float(i['closing_price']),
-                                                           'aankoopdatum': str(i['time']),
-                                                           'percentage_gain': percentage}
+            eps_ttm = float(eps_ttm.replace(",", ""))
+            trailing_pe = float(trailing_pe.replace(",", ""))
+            forward_pe = float(forward_pe.replace(",", ""))
+            pe_ratio_ttm = float(pe_ratio_ttm.replace(",", ""))
+            peg_ratio_5yr = float(peg_ratio_5yr.replace(",", ""))
+            roe_ttm = float(roe_ttm.replace('%', ""))
+            roa_ttm = float(roa_ttm.replace('%', ""))
+            current_price = float(current_price.replace(",", ""))
 
-                        sell_message = f"Verkoop:\n Bearish {last_row['market']} prijs: {last_row['close']} " \
-                                       f"aankoopkoers: {float(i['closing_price'])}\n " \
-                                       f"percentage gained: {percentage}"
+            print("Laatste data:")
+            print(last_row, last_index)
+            print(f"PE ratio ttm:{pe_ratio_ttm}\nROE ttm: {roe_ttm}\nROA ttm: {roa_ttm}\nEPS ttm: {eps_ttm}\nPEG_ratio 5y: {peg_ratio_5yr}")
+            print('--------------------------------------------------------')
 
-                        print(sell_order)
-                        self.update_file(self._file_path, sell_order)
-                        await self.send_telegram_message(sell_message)
+            #
+            # forward_div_yield = re.search(r'\(([\d.]+)%\)', forward_div_yield)
+            # forward_div_yield = float(forward_div_yield.group(1))
 
-        else:
-            print('Geen verkoopsignalen gevonden')
+
+            data = {'stock': market, 'date': str(datetime.now()), "eps ttm" : eps_ttm, 'trailing pe': trailing_pe, "forward pe": forward_pe,
+                    "pe ratio ttm": pe_ratio_ttm, "peg ratio 5y": peg_ratio_5yr, "roe ttm": roe_ttm, "roa ttm": roa_ttm
+                    }
+
+            self.update_data(self._file_path_data, data)
+
+
+            if self.load_data(self._file_path_assets) is not None:
+                for i in self.load_data(self._file_path_assets):
+
+                    if i['type'] == 'Bought' and i['symbol'] == market and i['strategy'] == 'Long' and \
+                         roa_ttm < 8 or roe_ttm < 10 and indicators_buy_long == False:
+
+                            percentage = (float(current_price) - float(i['price_bought'])) / float(
+                                i['price_bought']) * 100
+                            percentage = round(percentage, 2)
+                            sell_order = {'type': 'Sold', 'symbol': market,
+                                          'order': i['order'],
+                                          'time': str(datetime.now),
+                                          'closing_price': current_price,
+                                          'price_bought': i['price_bought'],
+                                          'date_bought': str(i['date_bought']),
+                                          'percentage_gained': percentage}
+
+                            sell_message = f"Verkoop:\n {market} prijs: {current_price} " \
+                                           f"aankoopkoers: {float(i['price_bought'])}\n " \
+                                           f"percentage gained: {percentage}"
+
+                            print(sell_order)
+                            await self.send_telegram_message(sell_message)
+                            self.update_assets(self._file_path_assets, sell_order)
+
+                    else:
+                        percentage = (float(current_price) - float(i['price_bought'])) / float(
+                            i['price_bought']) * 100
+                        percentage = round(percentage, 2)
+                        update_order = {'type': 'Bought', 'symbol': market,
+                                        'order': i['order'],
+                                        'last_update': str(datetime.now()),
+                                        'closing_price': current_price,
+                                        'price_bought': float(i['price_bought']),
+                                        'date_bought': str(i['date_bought']),
+                                        'percentage_gained': percentage}
+
+                        update_message = f"Update:\n {market} prijs: {current_price} " \
+                                         f"aankoopkoers: {float(i['closing_price'])}\n " \
+                                         f"percentage gained: {percentage}"
+
+                        self.update_assets(self._file_path_assets, update_order)
+
+
+                    if pe_ratio_ttm < 25 and roe_ttm >= 10 and roa_ttm >= 8 and peg_ratio_5yr < 1.5 and indicators_buy_long:
+
+                        buy_message = f"Koop:\n Positie: Short\n Market: {market} Prijs: {current_price}"
+                        order_number = random.randint(100, 999)
+                        buy_order = {'type': 'Bought', 'strategy': 'Long', 'symbol': market,
+                                     'time': str(datetime.now()),
+                                     'price_bought': current_price,
+                                     'order': order_number}
+
+                        print(buy_order)
+                        await self.send_telegram_message(buy_message)
+                        self.update_assets(self._file_path_assets, buy_order)
+
+        # self.plot_data(df)
+        return df
 
 
     async def main(self, bot):
-        # start_time = datetime.now()
-        # end_time = start_time + timedelta(hours=15)
+            for i in self._markets:
+                await bot.get_data(market=i)
 
-        # while datetime.now() < end_time:
-        for i in self._markets:
-            df = bot.get_bitvavo_data(interval='1h', limit=1440, market=i) 
-            df = bot.add_indicators(df)
-            data_complete = bot.generate_signals(df)
-            await bot.check_signals(data_complete)
-
-            # time.sleep(5)
 
 if __name__ == '__main__':
-    # file_path = 'CryptoOrders.json'
-    file_path = os.getenv('FILE_PATH')
-    bot = apibot(file_path=file_path, markets=['SOL-EUR', 'ADA-EUR', 'AVAX-EUR', 'ICP-EUR',
-                                               'COTI-EUR', 'JUP-EUR', 'MANTA-EUR', 'CFX-EUR'])
+    file_path_assets = os.getenv('FILE_PATH_ASSETS')
+    file_path_data = os.getenv('FILE_PATH_DATA')
+    bot = apibot(file_path_assets=file_path_assets, file_path_data=file_path_data, markets=['BRK-B', 'BRK-A', 'KNSL', 'FLOW.AS', 'GS', 'BAC', 'MS', 'AXP', 'SCHW', 'BLK']) #Financiele diensten
     asyncio.run(bot.main(bot))
+
 
