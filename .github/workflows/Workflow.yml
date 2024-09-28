@@ -26,6 +26,6 @@ jobs:
         
       - name: Run script
         env:
-          API_KEYS: ${{ secrets.API_KEYS }}
+          API_KEYS: ${{ secrets.APIKEYS }}
         run: |
           python BOT.py
