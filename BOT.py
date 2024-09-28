@@ -116,7 +116,7 @@ class apibot():
       response = bitvavo.candles(market, interval, {'limit': limit})
       if isinstance(response, dict):
           if response['errorCode'] == 205:
-              print(f"Aandeel {market} niet gevonden")
+              print(f"Asset: {market} niet gevonden")
 
               return None
       else:
