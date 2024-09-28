@@ -240,7 +240,7 @@ class apibot():
 
 
 if __name__ == '__main__':
-    bot = apibot(markets=['AVAXEUR', 'BEAMEUR', 'ARBEUR', 'INJEUR', 'SOLEUR', 'ADAEUR', 'STXEUR', 'ADAEUR'])
+    bot = apibot(markets=['AVAX-EUR', 'BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR'])
     asyncio.run(bot.main(bot))
 
 
