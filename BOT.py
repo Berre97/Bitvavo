@@ -26,10 +26,9 @@ bitvavo = Bitvavo({
 
 
 class apibot():
-    def __init__(self, file_path, markets):
+    def __init__(self, markets):
         self._markets = markets
-        self._file_path = file_path
-
+      
     def get_market_price(self, symbol):
         ticker = bitvavo.tickerPrice({'market': symbol})
         if 'error' in ticker:
@@ -241,7 +240,7 @@ class apibot():
 
 
 if __name__ == '__main__':
-    bot = apibot(file_path=file_path, markets=['AVAXEUR', 'BEAMEUR', 'ARBEUR', 'INJEUR', 'SOLEUR', 'ADAEUR', 'STXEUR', 'ADAEUR'])
+    bot = apibot(markets=['AVAXEUR', 'BEAMEUR', 'ARBEUR', 'INJEUR', 'SOLEUR', 'ADAEUR', 'STXEUR', 'ADAEUR'])
     asyncio.run(bot.main(bot))
 
 
