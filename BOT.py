@@ -241,7 +241,6 @@ class apibot():
 
 
 if __name__ == '__main__':
-    file_path = os.getenv('FILE_PATH')
     bot = apibot(file_path=file_path, markets=['AVAXEUR', 'BEAMEUR', 'ARBEUR', 'INJEUR', 'SOLEUR', 'ADAEUR', 'STXEUR', 'ADAEUR'])
     asyncio.run(bot.main(bot))
 
