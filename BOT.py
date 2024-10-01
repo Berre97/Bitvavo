@@ -79,9 +79,9 @@ class apibot():
             return take_profit_order
 
 
-    def place_long_position(self, symbol, amount, stop_loss_percentage, take_profit_percentage):
+    async def place_long_position(self, symbol, amount, stop_loss_percentage, take_profit_percentage):
 
-        order = self.place_market_order(self, symbol, amount, 'buy')
+        order = await self.place_market_order(symbol, amount, 'buy')
         if order:
             buy_price = float(order['fills'][0]['price'])
             stop_loss_price = round(buy_price * (1 - stop_loss_percentage / 100), 2)
@@ -222,7 +222,7 @@ class apibot():
             if last_row['Buy Signal Long'] and last_row['RSI_Overbought'] != True:
                 if self.check_balance('EUR'):
                     market = last_row['market']
-                    amount = round(float(self.check_balance('EUR')) * 0.1 / self.get_market_price(market), 2)
+                    amount = round(float(5) / self.get_market_price(market), 2)
 
                     self.place_long_position(symbol=market, amount=amount, stop_loss_percentage=4, take_profit_percentage=6)
 
