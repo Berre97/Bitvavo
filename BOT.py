@@ -201,11 +201,7 @@ class apibot():
                                ~df['EMA_21_above_EMA_55']).rolling(window=20).sum() == 20
 
             df['volume_MA'] = df['volume'].rolling(window=20).mean()
-            df['Bullish'] = (df['EMA_8'] > df['EMA_13']) & (df['EMA_13'] > df['EMA_21']) & (df['EMA_21'] > df['EMA_55'])
-            df['Bearish'] = (df['EMA_8'] < df['EMA_13']) & (df['EMA_13'] < df['EMA_21']) & (df['EMA_21'] < df['EMA_55'])
-            df['Buy Signal Long'] = df['EMA_above']
-            df['Buy Signal Short'] = df['EMA_below']
-
+    
             return df
 
 
@@ -219,8 +215,9 @@ class apibot():
             print('--------------------------------------------------------')
             
             # Going long
-            print(last_row['Buy Signal Long'], last_row['RSI_Overbought'])
-            if last_row['Buy Signal Long'] and last_row['RSI_Overbought'] != True:
+            print("test")
+            print(last_row['EMA_above'], last_row['RSI_Overbought'])
+            if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
                 amount_eur = 6
                 print(self.check_balance)
                 order_number = random.randint(1000, 9999)
