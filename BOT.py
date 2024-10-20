@@ -234,9 +234,9 @@ class apibot():
 
                 #     self.place_long_position(symbol=market, amount=amount, stop_loss_percentage=4, take_profit_percentage=6)
 
-                else:
-                    error_message = "Ontoereikend cashsaldo in portfilio, laad geld op"
-                    await self.send_telegram_message(error_message)
+                # else:
+                #     error_message = "Ontoereikend cashsaldo in portfilio, laad geld op"
+                #     await self.send_telegram_message(error_message)
 
 
     async def main(self, bot):
