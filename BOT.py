@@ -221,7 +221,7 @@ class apibot():
                 amount_eur = 6
                 print(self.check_balance)
                 order_number = random.randint(1000, 9999)
-                buy_message = f"Koop Bitvavo:\n Positie: Short\n Market: {last_row['market']} Prijs: {last_row['close']}"
+                buy_message = f"Koop Bitvavo:\n Positie: Long\n Market: {last_row['market']} Prijs: {last_row['close']}"
             
                 await self.send_telegram_message(buy_message)
                 # if self.check_balance('EUR') > amount_eur:
