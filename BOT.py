@@ -219,6 +219,7 @@ class apibot():
             print('--------------------------------------------------------')
             
             # Going long
+            print(last_row['Buy Signal Long'], last_row['RSI_Overbought'])
             if last_row['Buy Signal Long'] and last_row['RSI_Overbought'] != True:
                 amount_eur = 6
                 print(self.check_balance)
@@ -226,12 +227,12 @@ class apibot():
                 buy_message = f"Koop Bitvavo:\n Positie: Short\n Market: {last_row['market']} Prijs: {last_row['close']}"
             
                 await self.send_telegram_message(buy_message)
-                if self.check_balance('EUR') > amount_eur:
-                    print("Order wordt geplaatst!")
-                    market = last_row['market']
-                    amount = round(float(amount_eur) / self.get_market_price(market), 2)
+                # if self.check_balance('EUR') > amount_eur:
+                #     print("Order wordt geplaatst!")
+                #     market = last_row['market']
+                #     amount = round(float(amount_eur) / self.get_market_price(market), 2)
 
-                    self.place_long_position(symbol=market, amount=amount, stop_loss_percentage=4, take_profit_percentage=6)
+                #     self.place_long_position(symbol=market, amount=amount, stop_loss_percentage=4, take_profit_percentage=6)
 
                 else:
                     error_message = "Ontoereikend cashsaldo in portfilio, laad geld op"
