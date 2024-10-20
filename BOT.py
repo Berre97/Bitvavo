@@ -220,10 +220,16 @@ class apibot():
             
             # Going long
             if last_row['Buy Signal Long'] and last_row['RSI_Overbought'] != True:
-                if self.check_balance('EUR') != 0:
+                amount_eur = 6
+                print(self.check_balance)
+                order_number = random.randint(1000, 9999)
+                buy_message = f"Koop Bitvavo:\n Positie: Short\n Market: {last_row['market']} Prijs: {last_row['close']}"
+            
+                await self.send_telegram_message(buy_message)
+                if self.check_balance('EUR') > amount_eur:
                     print("Order wordt geplaatst!")
                     market = last_row['market']
-                    amount = round(float(6) / self.get_market_price(market), 2)
+                    amount = round(float(amount_eur) / self.get_market_price(market), 2)
 
                     self.place_long_position(symbol=market, amount=amount, stop_loss_percentage=4, take_profit_percentage=6)
 
