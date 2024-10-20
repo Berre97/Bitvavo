@@ -220,9 +220,10 @@ class apibot():
             
             # Going long
             if last_row['Buy Signal Long'] and last_row['RSI_Overbought'] != True:
-                if self.check_balance('EUR'):
+                if self.check_balance('EUR') != 0:
+                    print("Order wordt geplaatst!")
                     market = last_row['market']
-                    amount = round(float(5) / self.get_market_price(market), 2)
+                    amount = round(float(6) / self.get_market_price(market), 2)
 
                     self.place_long_position(symbol=market, amount=amount, stop_loss_percentage=4, take_profit_percentage=6)
 
