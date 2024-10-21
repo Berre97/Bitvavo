@@ -2,7 +2,7 @@ name: Workflow Bitvavo
 
 on:
   schedule:
-    - cron: '58 8-22 * *  *'  
+    - cron: '58 * * * *'  
   workflow_dispatch:  
 
 jobs:
