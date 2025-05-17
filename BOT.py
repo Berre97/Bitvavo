@@ -310,7 +310,7 @@ def main(bot):
                     amount = round(quantity * current_price,2)
                     stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),4)
                     limit_price = round(stop_loss_price * 0.99, 4)
-                    take_profit_price = round(current_price * (1+(take_profit_percentage 100)),4)
+                    take_profit_price = round(current_price * (1+(take_profit_percentage/100)),4)
                     bot._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
                     "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
                     "huidige_marktprijs": current_price}
