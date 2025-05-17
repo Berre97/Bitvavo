@@ -258,20 +258,20 @@ class apibot():
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
-                # if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
-                if self.check_balance('EUR'):
-                    stop_loss_percentage = 4
-                    take_profit_percentage = 6
-                    eur_per_trade = 6
-                    current_price = self.get_market_price(market)
-                    quantity = round(eur_per_trade / current_price,2)
-                    amount = round(quantity * current_price,2)
-                    stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),4)
-                    limit_price = round(stop_loss_price * 0.99, 4)
-                    take_profit_price = round(current_price * (1+(take_profit_percentage/100)),4)
-                    self._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
-                    "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
-                    "huidige_marktprijs": current_price}
+                if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
+                    if self.check_balance('EUR'):
+                        stop_loss_percentage = 4
+                        take_profit_percentage = 6
+                        eur_per_trade = 6
+                        current_price = self.get_market_price(market)
+                        quantity = round(eur_per_trade / current_price,2)
+                        amount = round(quantity * current_price,2)
+                        stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),4)
+                        limit_price = round(stop_loss_price * 0.99, 4)
+                        take_profit_price = round(current_price * (1+(take_profit_percentage/100)),4)
+                        self._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
+                        "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                        "huidige_marktprijs": current_price}
 
     def get_bitvavo_data(self, market, interval, limit):
         response = bitvavo.candles(market, interval, {'limit': limit})
