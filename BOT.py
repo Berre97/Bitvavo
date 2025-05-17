@@ -60,7 +60,7 @@ class apibot():
 
             buy_message = f"Koopsignaal gedetecteerd:\nValuta: {markt}\nPrijs per eenheid: €{round(prijs_per_eenheid,2)}\n\n " \
                           f"Totaalbedrag: €{value['orderprijs']}\n" \
-                          f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je deze koop bevestigen?"
+                          f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je deze aankoop bevestigen?"
 
             print(key, value['hoeveelheid'], prijs_per_eenheid, value['stop_loss'], value['take_profit'], value['orderprijs'])
 
