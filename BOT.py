@@ -1,5 +1,6 @@
 from python_bitvavo_api.bitvavo import Bitvavo
 import json
+import os
 import pandas as pd
 import numpy as np
 import asyncio
