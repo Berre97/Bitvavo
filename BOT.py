@@ -14,7 +14,7 @@ from datetime import datetime
 api_keys = json.loads(os.getenv('API_KEYS'))
 api_key = api_keys['API_KEY']
 api_secret = api_keys['API_SECRET']
-token = Bot(token=api_keys['token'])
+token = api_keys['token']
 chat_id = api_keys["chat_id"]
 app = ApplicationBuilder().token(token).build()
 
