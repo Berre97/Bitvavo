@@ -10,12 +10,12 @@ import sys
 import ta
 from datetime import datetime
 
-app = ApplicationBuilder().token(telegram_token).build()
 api_keys = json.loads(os.getenv('API_KEYS'))
 api_key = api_keys['API_KEY']
 api_secret = api_keys['API_SECRET']
 token = Bot(token=api_keys['token'])
 chat_id = api_keys["chat_id"]
+app = ApplicationBuilder().token(token).build()
 
 bitvavo = Bitvavo({
     'APIKEY': api_keys['API_KEY'],
