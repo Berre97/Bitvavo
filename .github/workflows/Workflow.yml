@@ -31,6 +31,6 @@ jobs:
       - name: Run script
         env:
           FILE_PATH_BUYORDERS: ${{ env.FILE_PATHBUYORDERS}}
-
+          API_KEYS: ${{ secrets.APIKEYS }}
         run: |
           python BOT.py
