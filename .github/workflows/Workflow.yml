@@ -34,3 +34,16 @@ jobs:
           API_KEYS: ${{ secrets.APIKEYS }}
         run: |
           python BOT.py
+
+      - name: Commit and push changes if there are any
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull origin main
+          if (Test-Path "$env:FILE_PATH_BUYORDERS") {
+            git add $env:FILE_PATH_ASSETS
+            git commit -m "Update $env:FILE_PATH_BUYORDERS"
+            git push
+          } else {
+            Write-Output "No changes to commit."
+          }
