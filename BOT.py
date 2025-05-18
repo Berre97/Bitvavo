@@ -282,7 +282,7 @@ class apibot():
 
 def main(bot):
     markets = ['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR']
-    stop_loss_percentage = 4
+    stop_loss_percentage = 8 #4
     take_profit_percentage = 6
     eur_per_trade = 6
     for market in markets:
@@ -309,7 +309,7 @@ def main(bot):
                 data = json.load(f)
                 for order in data:
                     for i in open_orders:
-                        if order["market"] == market and i["orderId"] == order["Id"] and current_price >= float(order["price"]) * take_profit_percentage:
+                        if order["market"] == market and i["orderId"] == order["Id"]:
                             bitvavo.cancelOrder(market, order["Id"])
                             bitvavo.placeOrder(market, "sell", "market", {'amount': order["amount"]})
 
