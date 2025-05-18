@@ -63,8 +63,6 @@ class apibot():
                           f"Totaalbedrag: €{value['orderprijs']}\n" \
                           f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je aankopen?"
 
-            print(key, value['hoeveelheid'], prijs_per_eenheid, value['stop_loss'], value['take_profit'], value['orderprijs'])
-
             await self._bot.send_message(chat_id=self._chat_id, text=buy_message, reply_markup=self.maak_knoppen())
             asyncio.create_task(self.timeout_sessie(self._chat_id))
 
@@ -298,7 +296,7 @@ def main(bot):
                     limit_price = round(stop_loss_price * 0.99, 3)
     
                     bot._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
-                    "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                    "stop_loss": stop_loss_price, "stop_limit": limit_price,
                     "huidige_marktprijs": current_price}
 
         open_orders = bitvavo.ordersOpen({})
