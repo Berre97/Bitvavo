@@ -85,7 +85,7 @@ class apibot():
 
             await self._bot.send_message(text="Bezig met plaatsen van order...", chat_id=self._chat_id)
             await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
-
+            sys.exit()
 
         if antwoord == "nee":
             self._index += 1
