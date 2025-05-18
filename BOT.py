@@ -61,7 +61,7 @@ class apibot():
 
             buy_message = f"Koopsignaal gedetecteerd:\nValuta: {markt}\nPrijs per eenheid: €{round(prijs_per_eenheid,2)}\n\n " \
                           f"Totaalbedrag: €{value['orderprijs']}\n" \
-                          f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je deze koop bevestigen?"
+                          f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je aankopen?"
 
             print(key, value['hoeveelheid'], prijs_per_eenheid, value['stop_loss'], value['take_profit'], value['orderprijs'])
 
@@ -83,7 +83,6 @@ class apibot():
             stop_loss_price = value['stop_loss']
             stop_loss_limit = value['stop_limit']
 
-            await self._bot.send_message(text="Bezig met plaatsen van order...", chat_id=self._chat_id)
             await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
             sys.exit()
 
@@ -167,7 +166,7 @@ class apibot():
             await self._bot.send_message(chat_id=self._chat_id, text=error_message)
 
         else:
-            success_message = f"{side.capitalize()}order succesvol!"
+            success_message = f"{side.capitalize()}order succesvol uitgevoerd!"
             print(success_message)
             await self._bot.send_message(chat_id=self._chat_id, text=success_message)
             await self.place_stop_loss(symbol, amount, stop_loss_price, stop_loss_limit)
@@ -282,7 +281,7 @@ class apibot():
 
 def main(bot):
     markets = ['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR']
-    stop_loss_percentage = 8 #4
+    stop_loss_percentage = 4
     take_profit_percentage = 6
     eur_per_trade = 6
     for market in markets:
@@ -291,17 +290,16 @@ def main(bot):
         df = bot.add_indicators(df)
         if df is not None:
             last_row = df.iloc[-1]
-            # if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
-            if bot.check_balance('EUR'):
-                quantity = round(eur_per_trade / current_price,2)
-                amount = round(quantity * current_price,2)
-                stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
-                limit_price = round(stop_loss_price * 0.99, 3)
-                take_profit_price = round(current_price * (1+(take_profit_percentage/100)),3)
-
-                bot._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
-                "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
-                "huidige_marktprijs": current_price}
+            if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
+                if bot.check_balance('EUR'):
+                    quantity = round(eur_per_trade / current_price,2)
+                    amount = round(quantity * current_price,2)
+                    stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
+                    limit_price = round(stop_loss_price * 0.99, 3)
+    
+                    bot._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
+                    "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                    "huidige_marktprijs": current_price}
 
         open_orders = bitvavo.ordersOpen({})
         if os.path.exists(bot._file_path) and bot._file_path is not None:
@@ -309,7 +307,7 @@ def main(bot):
                 data = json.load(f)
                 for order in data:
                     for i in open_orders:
-                        if order["market"] == market and i["orderId"] == order["Id"]:
+                        if order["market"] == market and i["orderId"] == order["Id"] and current_price >= order["price"] * take_profit_percentage:
                             bitvavo.cancelOrder(market, order["Id"])
                             bitvavo.placeOrder(market, "sell", "market", {'amount': order["amount"]})
 
