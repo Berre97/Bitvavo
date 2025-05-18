@@ -41,7 +41,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git pull origin main
           if (Test-Path "$env:FILE_PATH_BUYORDERS") {
-            git add $env:FILE_PATH_ASSETS
+            git add $env:FILE_PATH_BUYORDERS
             git commit -m "Update $env:FILE_PATH_BUYORDERS"
             git push
           } else {
