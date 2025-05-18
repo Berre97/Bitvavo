@@ -76,6 +76,7 @@ class apibot():
         antwoord = update.message.text.lower()
 
         if antwoord == "ja":
+            print('yess')
             key, value = list(self._buy_signals.items())[self._index]
             market = key
             amount = value['hoeveelheid']
@@ -98,6 +99,7 @@ class apibot():
         keuze = query.data
 
         if keuze == "ja":
+            print('yess')
             key, value = list(self._buy_signals.items())[self._index]
             market = key
             amount = value['hoeveelheid']
