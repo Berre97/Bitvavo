@@ -66,7 +66,7 @@ class apibot():
             print(key, value['hoeveelheid'], prijs_per_eenheid, value['stop_loss'], value['take_profit'], value['orderprijs'])
 
             await self._bot.send_message(chat_id=self._chat_id, text=buy_message, reply_markup=self.maak_knoppen())
-            asyncio.create_task(self.timeout_sessie(self._chat_id))
+            await asyncio.create_task(self.timeout_sessie(self._chat_id))
 
         else:
             await self._bot.send_message(chat_id=self._chat_id, text="Er zijn geen koopsignalen meer.")
@@ -85,7 +85,7 @@ class apibot():
 
             await self._bot.send_message(text="Bezig met plaatsen van order...", chat_id=self._chat_id)
             await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
-
+            sys.exit()
 
         if antwoord == "nee":
             self._index += 1
@@ -319,6 +319,10 @@ def main(bot):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(bot.manage_orders(app))
     app.run_polling()
+
+
+
+
 
 if __name__ == '__main__':
     bot = apibot()
