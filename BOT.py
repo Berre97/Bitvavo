@@ -34,7 +34,7 @@ class apibot():
         self._index = 0
         self._chat_id = -4717875969
         self._msg_id = None
-        self._file_path = os.getenv("PATH_BUYORDERS")
+        self._file_path = os.getenv("FILE_PATH_BUYORDERS")
 
 
     async def timeout_sessie(self, chat_id):
