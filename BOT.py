@@ -39,7 +39,7 @@ class apibot():
 
     async def timeout_sessie(self, chat_id):
         try:
-            await asyncio.sleep(900)  # 15 minuten
+            await asyncio.sleep(10)  # 15 minuten
             await self._bot.send_message(chat_id=chat_id, text="⏰ Tijd is verstreken. Order niet meer uitvoerbaar.")
             sys.exit()  # Hele programma stoppen
         except asyncio.CancelledError:
