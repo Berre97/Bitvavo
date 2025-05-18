@@ -30,7 +30,7 @@ jobs:
         
       - name: Run script
         env:
-          FILE_PATH_BUYORDERS: ${{ env.FILE_PATH_BUYORDERS}}
+          FILE_PATH_BUYORDERS: ${{ env.FILE_PATHBUYORDERS}}
 
         run: |
           python BOT.py
