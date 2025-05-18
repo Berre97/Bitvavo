@@ -101,8 +101,6 @@ class apibot():
             side = 'buy'
             stop_loss_price = value['stop_loss']
             stop_loss_limit = value["stop_limit"]
-
-            await self._bot.send_message(chat_id=self._chat_id, text=f"Bezig met plaatsen van order.....")
             await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
 
             sys.exit()
