@@ -2,8 +2,8 @@ name: Workflow Bitvavo
 
 on:
   schedule:
-    - cron: '58 * * * *'  
-  workflow_dispatch:  
+    - cron: '58 * * *  *'  
+  workflow_dispatch:  # Maakt handmatige triggers mogelijk
 
 jobs:
   manage-data:
@@ -13,6 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set environment variable for JSON file
+        run: |
+          "FILE_PATH_BUYORDERS=BuyOrders.json" | Out-File -FilePath $env:GITHUB_ENV -Append
+        shell: pwsh
+
+      - name: Debug environment variable
+        run: |
+          Write-Output "FILE_PATH is: $env:FILE_PATH"
+        shell: pwsh
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -20,6 +30,7 @@ jobs:
         
       - name: Run script
         env:
-          API_KEYS: ${{ secrets.APIKEYS }}
+          FILE_PATH_BUYORDERS: ${{ env.FILE_PATH_BUYORDERS}}
+
         run: |
           python BOT.py
