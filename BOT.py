@@ -34,7 +34,7 @@ class apibot():
         self._index = 0
         self._chat_id = -4717875969
         self._msg_id = None
-        self._file_path = os.getenv("FILE_PATH_BUYORDERS")
+        self._file_path = os.getenv("PATH_BUYORDERS")
 
 
     async def timeout_sessie(self, chat_id):
@@ -66,7 +66,7 @@ class apibot():
             print(key, value['hoeveelheid'], prijs_per_eenheid, value['stop_loss'], value['take_profit'], value['orderprijs'])
 
             await self._bot.send_message(chat_id=self._chat_id, text=buy_message, reply_markup=self.maak_knoppen())
-            await asyncio.create_task(self.timeout_sessie(self._chat_id))
+            asyncio.create_task(self.timeout_sessie(self._chat_id))
 
         else:
             await self._bot.send_message(chat_id=self._chat_id, text="Er zijn geen koopsignalen meer.")
@@ -76,7 +76,6 @@ class apibot():
         antwoord = update.message.text.lower()
 
         if antwoord == "ja":
-            print('yess')
             key, value = list(self._buy_signals.items())[self._index]
             market = key
             amount = value['hoeveelheid']
@@ -86,6 +85,7 @@ class apibot():
 
             await self._bot.send_message(text="Bezig met plaatsen van order...", chat_id=self._chat_id)
             await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
+
 
         if antwoord == "nee":
             self._index += 1
@@ -98,7 +98,6 @@ class apibot():
         keuze = query.data
 
         if keuze == "ja":
-            print('yess')
             key, value = list(self._buy_signals.items())[self._index]
             market = key
             amount = value['hoeveelheid']
@@ -108,7 +107,9 @@ class apibot():
 
             await self._bot.send_message(chat_id=self._chat_id, text=f"Bezig met plaatsen van order.....")
             await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
-     
+
+            sys.exit()
+
         elif keuze == "nee":
             self._index += 1
             await self.manage_orders(app)
@@ -135,6 +136,7 @@ class apibot():
                                          text=(f"Stop-loss order succesvol geplaatst!"))
 
             self._order["Id"] = stop_loss_order["orderId"]
+            print(self._order)
             if os.path.exists(self._file_path):
                 try:
                     with open(self._file_path, 'r') as f:
@@ -320,9 +322,7 @@ def main(bot):
     loop.run_until_complete(bot.manage_orders(app))
     app.run_polling()
 
-
 if __name__ == '__main__':
     bot = apibot()
     main(bot)
-
 
