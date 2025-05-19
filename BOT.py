@@ -66,10 +66,13 @@ class apibot():
             await self._bot.send_message(chat_id=self._chat_id, text=buy_message, reply_markup=self.maak_knoppen())
             asyncio.create_task(self.timeout_sessie(self._chat_id))
 
-        else:
+        elif self._buy_signals and self._index > len(self._buy_signals):
             await self._bot.send_message(chat_id=self._chat_id, text="Er zijn geen koopsignalen meer.")
             sys.exit()
 
+        else:
+            sys.exit()
+            
     async def tekst_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         antwoord = update.message.text.lower()
 
