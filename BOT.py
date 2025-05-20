@@ -282,7 +282,7 @@ def main(bot):
     markets = ['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR']
     stop_loss_percentage = 4
     take_profit_percentage = 6
-    eur_per_trade = 6
+    eur_per_trade = 10
     for market in markets:
         current_price = bot.get_market_price(market)
         df = bot.get_bitvavo_data(market, '1h', 100)
