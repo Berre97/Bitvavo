@@ -308,7 +308,7 @@ def main(bot):
                     for i in open_orders:
                         if order["market"] == market and i["orderId"] == order["Id"]:
                             print('TRUE')
-                            print(current_price / order['price'])
+                            print(float(current_price / order['price']))
 
                         else:
                             pass
