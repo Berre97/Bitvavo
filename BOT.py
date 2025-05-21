@@ -306,7 +306,7 @@ def main(bot):
                 data = json.load(f)
                 for order in data:
                     for i in open_orders:
-                        if order["market"] == market and i["orderId"] == order["Id"::
+                        if order["market"] == market and i["orderId"] == order["Id"]:
                             print('TRUE')
                             print(current_price / order['price'])
 
