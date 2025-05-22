@@ -309,7 +309,7 @@ def main(bot):
                         if order["market"] == market and i["orderId"] == order["Id"]:
                             profit = round((float(current_price)/1-float(order['price']))*100,2)
                             print(f"Profit: {profit}%")
-                            if float(current_price) >= float(order['price']) * 1+(take_profit_percentage/100):
+                            if profit >= take_profit_percentage:
                                 bitvavo.cancelOrder(market, order["Id"])
                                 bitvavo.placeOrder(market, "sell", "market", {'amount': order["amount"]})
                                 print(float(current_price) / float(order['price']))
