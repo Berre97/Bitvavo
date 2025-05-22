@@ -306,13 +306,15 @@ def main(bot):
                 data = json.load(f)
                 for order in data:
                     for i in open_orders:
-                        if order["market"] == market and i["orderId"] == order["Id"] and float(current_price) >= float(order['price']) * 1+(take_profit_percentage/100):
-                            bitvavo.cancelOrder(market, order["Id"])
-                            bitvavo.placeOrder(market, "sell", "market", {'amount': order["amount"]})
-                            print(float(current_price) / float(order['price']))
-
-                        else:
-                            pass
+                        if order["market"] == market and i["orderId"] == order["Id"]:
+                            print(f"Profit: {float(current_price)/float(order['price'])})
+                            if float(current_price) >= float(order['price']) * 1+(take_profit_percentage/100):
+                                bitvavo.cancelOrder(market, order["Id"])
+                                bitvavo.placeOrder(market, "sell", "market", {'amount': order["amount"]})
+                                print(float(current_price) / float(order['price']))
+    
+                            else:
+                                pass
 
     app.add_handler(CallbackQueryHandler(bot.knop_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bot.tekst_handler))
