@@ -170,6 +170,7 @@ class apibot():
                 initial_price = float(v['buyprice'])
                 selling_price = float(v['selling_price'])
                 profit = round(selling_price-initial_price,3)
+                print(k, v)
                 cancel_order = bitvavo.cancelOrder(market, id)
                 sell_order = bitvavo.placeOrder(market, "sell", "market", {'amount': amount})
                 if 'error' in cancel_order:
@@ -192,7 +193,6 @@ class apibot():
             market = self._placebuyorder['market']
             amount = self._placebuyorder['amount']
             order = bitvavo.placeOrder(market, "buy", 'market', {'amount': amount})
-            print(order)
             self._writebuyorder = {"market": market, "amount": order["fills"][0]["amount"], "price": order["fills"][0]["price"]}
 
 
@@ -320,7 +320,6 @@ class apibot():
         stop_loss_percentage = 3
         take_profit_percentage = 5
         eur_per_trade = 10
-        
         for market in markets:
             current_price = bot.get_market_price(market)
             df = self.get_bitvavo_data(market, '1h', 100)
@@ -333,21 +332,19 @@ class apibot():
                         amount = round(quantity * current_price,2)
                         stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
                         limit_price = round(stop_loss_price * 0.99, 3)
-                        
+                        take_profit_price = round(current_price * (1+(take_profit_percentage/100)),3)
+
                         self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
-                        "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                        "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
                         "huidige_marktprijs": current_price}
 
             open_orders = bitvavo.ordersOpen({})
             if os.path.exists(bot._file_path) and bot._file_path is not None:
-                print('YESS')
                 with open(bot._file_path, 'r') as f:
                     data = json.load(f)
                     for order in data:
                         for i in open_orders:
-                            print(i)
                             if order['market'] == market and i["orderId"] == order["Id"]:
-                                print('check')
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 print(f"Market: {order['market']} profit: {profit}%")
                                 if profit >= take_profit_percentage:
@@ -356,7 +353,8 @@ class apibot():
 
                             else:
                                 pass
-                            
+
+
 if __name__ == '__main__':
     bot = apibot()
     bot.check_orders(['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR'])
