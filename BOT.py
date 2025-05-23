@@ -319,7 +319,7 @@ class apibot():
     def check_orders(self, markets):
         stop_loss_percentage = 3
         take_profit_percentage = 5
-        eur_per_trade = 6
+        eur_per_trade = 10
         for market in markets:
             current_price = bot.get_market_price(market)
             df = self.get_bitvavo_data(market, '1h', 100)
@@ -332,10 +332,9 @@ class apibot():
                     amount = round(quantity * current_price,2)
                     stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
                     limit_price = round(stop_loss_price * 0.99, 3)
-                    take_profit_price = round(current_price * (1+(take_profit_percentage/100)),3)
-
+                    
                     self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
-                    "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                    "stop_loss": stop_loss_price, "stop_limit": limit_price,
                     "huidige_marktprijs": current_price}
 
             open_orders = bitvavo.ordersOpen({})
@@ -345,19 +344,15 @@ class apibot():
                     for order in data:
                         for i in open_orders:
                             if order['market'] == market and i["orderId"] == order["Id"]:
-                                print(f"Marktprijs: {current_price}")
-                                print(f"Aankoopprijs: {order['price']}")
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 print(f"Market: {order['market']} profit: {profit}%")
-
-                                print('Sell')
-                                bitvavo.cancelOrder(market, order["Id"])
-                                self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"], 'buyprice': order['price'], "selling_price": current_price}
+                                if profit >= take_profit_percentage:
+                                    bitvavo.cancelOrder(market, order["Id"])
+                                    self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"], 'buyprice': order['price'], "selling_price": current_price}
 
                             else:
                                 pass
                             
-
 if __name__ == '__main__':
     bot = apibot()
     bot.check_orders(['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR'])
