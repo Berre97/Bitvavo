@@ -320,22 +320,23 @@ class apibot():
         stop_loss_percentage = 3
         take_profit_percentage = 5
         eur_per_trade = 10
+        
         for market in markets:
             current_price = bot.get_market_price(market)
             df = self.get_bitvavo_data(market, '1h', 100)
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
-
-                if self.check_balance('EUR'):
-                    quantity = round(eur_per_trade / current_price,2)
-                    amount = round(quantity * current_price,2)
-                    stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
-                    limit_price = round(stop_loss_price * 0.99, 3)
-                    
-                    self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
-                    "stop_loss": stop_loss_price, "stop_limit": limit_price,
-                    "huidige_marktprijs": current_price}
+                if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
+                    if self.check_balance('EUR'):
+                        quantity = round(eur_per_trade / current_price,2)
+                        amount = round(quantity * current_price,2)
+                        stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
+                        limit_price = round(stop_loss_price * 0.99, 3)
+                        
+                        self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
+                        "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                        "huidige_marktprijs": current_price}
 
             open_orders = bitvavo.ordersOpen({})
             if os.path.exists(bot._file_path) and bot._file_path is not None:
