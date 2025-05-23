@@ -170,7 +170,6 @@ class apibot():
                 initial_price = float(v['buyprice'])
                 selling_price = float(v['selling_price'])
                 profit = round(selling_price-initial_price,3)
-                print(k, v)
                 cancel_order = bitvavo.cancelOrder(market, id)
                 sell_order = bitvavo.placeOrder(market, "sell", "market", {'amount': amount})
                 if 'error' in cancel_order:
@@ -193,6 +192,7 @@ class apibot():
             market = self._placebuyorder['market']
             amount = self._placebuyorder['amount']
             order = bitvavo.placeOrder(market, "buy", 'market', {'amount': amount})
+            print(order)
             self._writebuyorder = {"market": market, "amount": order["fills"][0]["amount"], "price": order["fills"][0]["price"]}
 
 
