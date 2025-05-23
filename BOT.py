@@ -30,11 +30,14 @@ class apibot():
     def __init__(self):
         self._bot = None
         self._buy_signals = {}
-        self._order = None
+        self._placesellorders = {}
+        self._placebuyorder = {}
+        self._writebuyorder = {}
+        self._orders = None
         self._index = 0
         self._chat_id = -4717875969
         self._msg_id = None
-        self._file_path = os.getenv("FILE_PATH_BUYORDERS")
+        self._file_path = "Trading_data.json"
 
 
     async def timeout_sessie(self, chat_id):
@@ -54,6 +57,12 @@ class apibot():
 
     async def manage_orders(self, application):
         self._bot = application.bot
+        if self._placesellorders:
+            await self.place_market_order()
+
+        else:
+            pass
+
         if self._buy_signals and self._index < len(self._buy_signals):
             key, value = list(self._buy_signals.items())[self._index]
             prijs_per_eenheid = value['huidige_marktprijs']
@@ -61,7 +70,7 @@ class apibot():
 
             buy_message = f"Koopsignaal gedetecteerd:\nValuta: {markt}\nPrijs per eenheid: €{round(prijs_per_eenheid,2)}\n\n " \
                           f"Totaalbedrag: €{value['orderprijs']}\n" \
-                          f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je aankopen?"
+                          f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je deze aankoop bevestigen?"
 
             await self._bot.send_message(chat_id=self._chat_id, text=buy_message, reply_markup=self.maak_knoppen())
             asyncio.create_task(self.timeout_sessie(self._chat_id))
@@ -72,20 +81,17 @@ class apibot():
 
         else:
             sys.exit()
-            
+
     async def tekst_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         antwoord = update.message.text.lower()
+        key, value = list(self._buy_signals.items())[self._index]
+        amount = value['hoeveelheid']
 
         if antwoord == "ja":
-            key, value = list(self._buy_signals.items())[self._index]
-            market = key
-            amount = value['hoeveelheid']
-            side = 'buy'
-            stop_loss_price = value['stop_loss']
-            stop_loss_limit = value['stop_limit']
-
-            await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
+            self._placebuyorder = {"market": key, "amount": amount}
+            await self.place_market_order()
             sys.exit()
+
 
         if antwoord == "nee":
             self._index += 1
@@ -96,15 +102,12 @@ class apibot():
         query = update.callback_query
         await query.answer()
         keuze = query.data
+        key, value = list(self._buy_signals.items())[self._index]
+        amount = value['hoeveelheid']
 
         if keuze == "ja":
-            key, value = list(self._buy_signals.items())[self._index]
-            market = key
-            amount = value['hoeveelheid']
-            side = 'buy'
-            stop_loss_price = value['stop_loss']
-            stop_loss_limit = value["stop_limit"]
-            await self.place_market_order(market, amount, side, stop_loss_price, stop_loss_limit)
+            self._placebuyorder = {"market": key, "amount": amount}
+            await self.place_market_order()
 
             sys.exit()
 
@@ -113,9 +116,14 @@ class apibot():
             await self.manage_orders(app)
 
 
-    async def place_stop_loss(self, symbol, amount, stop_loss_price, stop_loss_limit):
-        print(stop_loss_limit, stop_loss_price, amount)
-        stop_loss_order = bitvavo.placeOrder(symbol, 'sell', 'stopLossLimit', {
+    async def place_stop_loss(self):
+        key, value = list(self._buy_signals.items())[self._index]
+        market = key
+        amount = value['hoeveelheid']
+        stop_loss_price = value['stop_loss']
+        stop_loss_limit = value["stop_limit"]
+
+        stop_loss_order = bitvavo.placeOrder(market, 'sell', 'stopLossLimit', {
              'amount': amount,
              'price': stop_loss_limit,
              'triggerType': 'price',
@@ -133,8 +141,7 @@ class apibot():
             await self._bot.send_message(chat_id=self._chat_id,
                                          text=(f"Stop-loss order succesvol geplaatst!"))
 
-            self._order["Id"] = stop_loss_order["orderId"]
-            print(self._order)
+            self._writebuyorder["Id"] = stop_loss_order["orderId"]
             if os.path.exists(self._file_path):
                 try:
                     with open(self._file_path, 'r') as f:
@@ -146,7 +153,7 @@ class apibot():
                     data = []
             else:
                 data = []
-            data.append(self._order)
+            data.append(self._writebuyorder)
 
             with open(self._file_path, 'w') as f:
                 json.dump(data, f, indent=4)
@@ -154,21 +161,52 @@ class apibot():
             return stop_loss_order
 
 
-    async def place_market_order(self, symbol, amount, side, stop_loss_price, stop_loss_limit):
-        order = bitvavo.placeOrder(symbol, side, 'market', {'amount': amount})
-        print(order)
-        self._order = {"market": symbol, "amount": order["fills"][0]["amount"], "price": order["fills"][0]["price"]}
-        print(self._order)
+    async def place_market_order(self):
+        if self._placesellorders:
+            for k, v in self._placesellorders.items():
+                market = k
+                id = v['Id']
+                amount = v['amount']
+                initial_price = float(v['buyprice'])
+                selling_price = float(v['selling_price'])
+                profit = round(selling_price-initial_price,3)
+                print(k, v)
+                cancel_order = bitvavo.cancelOrder(market, id)
+                sell_order = bitvavo.placeOrder(market, "sell", "market", {'amount': amount})
+                if 'error' in cancel_order:
+                    error_message = f"Fout bij annuleren van stoploss order: {id}"
+                    await self._bot.send_message(chat_id=self._chat_id, text=error_message)
 
-        if 'error' in order:
-            error_message = f"Fout bij plaatsen {side} order: {order['error']}"
-            await self._bot.send_message(chat_id=self._chat_id, text=error_message)
+                if 'error' in sell_order:
+                    error_message = f"Fout bij het verkopen van: {market}\n" \
+                                    f"Hoeveelheid: {amount}"
+                    await self._bot.send_message(chat_id=self._chat_id, text=error_message)
+
+                else:
+                    success_message = f"Verkoop order: {market} succesvol\n" \
+                                      f"€{profit} winst!"
+                    await self._bot.send_message(chat_id=self._chat_id, text=success_message)
+        else:
+            pass
+
+        if self._placebuyorder:
+            market = self._placebuyorder['market']
+            amount = self._placebuyorder['amount']
+            order = bitvavo.placeOrder(market, "buy", 'market', {'amount': amount})
+            self._writebuyorder = {"market": market, "amount": order["fills"][0]["amount"], "price": order["fills"][0]["price"]}
+
+
+            if 'error' in order:
+                error_message = f"Fout bij plaatsen koop order: {order['error']}"
+                await self._bot.send_message(chat_id=self._chat_id, text=error_message)
+
+            else:
+                success_message = "Kooporder succesvol!"
+                await self._bot.send_message(chat_id=self._chat_id, text=success_message)
+                await self.place_stop_loss()
 
         else:
-            success_message = f"{side.capitalize()}order succesvol uitgevoerd!"
-            print(success_message)
-            await self._bot.send_message(chat_id=self._chat_id, text=success_message)
-            await self.place_stop_loss(symbol, amount, stop_loss_price, stop_loss_limit)
+            pass
 
     def get_market_price(self, symbol):
         ticker = bitvavo.tickerPrice({'market': symbol})
@@ -278,54 +316,53 @@ class apibot():
             return data
 
 
-def main(bot):
-    markets = ['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR']
-    stop_loss_percentage = 3
-    take_profit_percentage = 5
-    eur_per_trade = 10
-    for market in markets:
-        current_price = bot.get_market_price(market)
-        df = bot.get_bitvavo_data(market, '1h', 100)
-        df = bot.add_indicators(df)
-        if df is not None:
-            last_row = df.iloc[-1]
-            if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
-                if bot.check_balance('EUR'):
+    def check_orders(self, markets):
+        stop_loss_percentage = 3
+        take_profit_percentage = 5
+        eur_per_trade = 6
+        for market in markets:
+            current_price = bot.get_market_price(market)
+            df = self.get_bitvavo_data(market, '1h', 100)
+            df = self.add_indicators(df)
+            if df is not None:
+                last_row = df.iloc[-1]
+
+                if self.check_balance('EUR'):
                     quantity = round(eur_per_trade / current_price,2)
                     amount = round(quantity * current_price,2)
                     stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
                     limit_price = round(stop_loss_price * 0.99, 3)
-    
-                    bot._buy_signals[market] = {"type": "Long", "hoeveelheid": quantity, "orderprijs": amount,
-                    "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                    take_profit_price = round(current_price * (1+(take_profit_percentage/100)),3)
+
+                    self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
+                    "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
                     "huidige_marktprijs": current_price}
 
-        open_orders = bitvavo.ordersOpen({})
-        if os.path.exists(bot._file_path) and bot._file_path is not None:
-            with open(bot._file_path, 'r') as f:
-                data = json.load(f)
-                for order in data:
-                    for i in open_orders:
-                        if order["market"] == market and i["orderId"] == order["Id"]:
-                            print(f"marktprijs: {current_price}")
-                            print(f"aankoopprijs: {order['price']}")
-                            profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
-                            print(f"Market: {order['market']} profit: {profit}%")
-                            if profit >= take_profit_percentage:
+            open_orders = bitvavo.ordersOpen({})
+            if os.path.exists(bot._file_path) and bot._file_path is not None:
+                with open(bot._file_path, 'r') as f:
+                    data = json.load(f)
+                    for order in data:
+                        for i in open_orders:
+                            if order['market'] == market and i["orderId"] == order["Id"]:
+                                print(f"Marktprijs: {current_price}")
+                                print(f"Aankoopprijs: {order['price']}")
+                                profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
+                                print(f"Market: {order['market']} profit: {profit}%")
+
+                                print('Sell')
                                 bitvavo.cancelOrder(market, order["Id"])
-                                bitvavo.placeOrder(market, "sell", "market", {'amount': order["amount"]})
-                                print(float(current_price) / float(order['price']))
-    
+                                self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"], 'buyprice': order['price'], "selling_price": current_price}
+
                             else:
                                 pass
+                            
 
+if __name__ == '__main__':
+    bot = apibot()
+    bot.check_orders(['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR'])
     app.add_handler(CallbackQueryHandler(bot.knop_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bot.tekst_handler))
     loop = asyncio.get_event_loop()
     loop.run_until_complete(bot.manage_orders(app))
     app.run_polling()
-
-if __name__ == '__main__':
-    bot = apibot()
-    main(bot)
-
