@@ -167,12 +167,15 @@ class apibot():
                 market = k
                 id = v['Id']
                 amount = v['amount']
-                initial_price = float(v['buyprice'])
-                selling_price = float(v['selling_price'])
-                profit = round(selling_price-initial_price,3)
-                print(k, v)
+                total_paid = v["total_paid"]
+                
                 cancel_order = bitvavo.cancelOrder(market, id)
                 sell_order = bitvavo.placeOrder(market, "sell", "market", {'amount': amount})
+                amount_received = float(sell_order["filledAmountQuote"])
+                fee_paid = float(sell_order["fills"][0]["fee"])
+                total_received = round(amount_received-fee_paid,2)
+                profit = round(total_received-total_paid,2)
+                
                 if 'error' in cancel_order:
                     error_message = f"Fout bij annuleren van stoploss order: {id}"
                     await self._bot.send_message(chat_id=self._chat_id, text=error_message)
@@ -193,7 +196,11 @@ class apibot():
             market = self._placebuyorder['market']
             amount = self._placebuyorder['amount']
             order = bitvavo.placeOrder(market, "buy", 'market', {'amount': amount})
-            self._writebuyorder = {"market": market, "amount": order["fills"][0]["amount"], "price": order["fills"][0]["price"]}
+            fee_paid = float(order["fills"][0]["fee"])
+            amount_filled = float(order["filledAmountQuote"])
+            total_paid = round(fee_paid+amount_filled,2)
+            self._writebuyorder = {"market": market, "amount": order["fills"][0]["amount"],
+                                   "price": order["fills"][0]["price"], "total_paid": total_paid}
 
 
             if 'error' in order:
@@ -349,7 +356,8 @@ class apibot():
                                 print(f"Market: {order['market']} profit: {profit}%")
                                 if profit >= take_profit_percentage:
                                     bitvavo.cancelOrder(market, order["Id"])
-                                    self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"], 'buyprice': order['price'], "selling_price": current_price}
+                                    self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
+                                                                     "total_paid": order["total_paid"]}
 
                             else:
                                 pass
