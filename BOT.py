@@ -248,14 +248,6 @@ class apibot():
             df['EMA_13_above_EMA_21'] = df['EMA_13'] > df['EMA_21']
             df['EMA_21_above_EMA_55'] = df['EMA_21'] > df['EMA_55']
 
-            df['EMA_above'] = (df['EMA_8_above_EMA_13'] &
-                               df['EMA_13_above_EMA_21'] &
-                               df['EMA_21_above_EMA_55']).rolling(window=20).sum() == 20
-
-            df['EMA_below'] = (~df['EMA_8_above_EMA_13'] &
-                               ~df['EMA_13_above_EMA_21'] &
-                               ~df['EMA_21_above_EMA_55']).rolling(window=20).sum() == 20
-
             df['volume_MA'] = df['volume'].rolling(window=20).mean()
             df['Bullish'] = (df['EMA_8'] > df['EMA_13']) & (df['EMA_13'] > df['EMA_21']) & (df['EMA_21'] > df['EMA_55'])
             df['Bearish'] = (df['EMA_8'] < df['EMA_13']) & (df['EMA_13'] < df['EMA_21']) & (df['EMA_21'] < df['EMA_55'])
@@ -264,7 +256,7 @@ class apibot():
 
 
             # RSI Overbought / Oversold
-            df['RSI_Overbought'] = np.where(df['RSI'] >= 55, True, False)
+            df['RSI_Overbought'] = np.where(df['RSI'] >= 65, True, False)
             df['RSI_Oversold'] = np.where(df['RSI'] <= 35, True, False)
 
             # MACD Crossovers
@@ -281,11 +273,11 @@ class apibot():
 
             df['EMA_above'] = (df['EMA_8_above_EMA_13'] &
                                df['EMA_13_above_EMA_21'] &
-                               df['EMA_21_above_EMA_55']).rolling(window=5).sum() == 5
+                               df['EMA_21_above_EMA_55']).rolling(window=8).sum() == 8
 
             df['EMA_below'] = (~df['EMA_8_above_EMA_13'] &
                                ~df['EMA_13_above_EMA_21'] &
-                               ~df['EMA_21_above_EMA_55']).rolling(window=5).sum() == 5
+                               ~df['EMA_21_above_EMA_55']).rolling(window=8).sum() == 8
 
             return df
 
@@ -329,11 +321,11 @@ class apibot():
         eur_per_trade = 10
         for market in markets:
             current_price = bot.get_market_price(market)
-            df = self.get_bitvavo_data(market, '1h', 100)
+            df = self.get_bitvavo_data(market, '30m', 100)
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
-                if last_row['EMA_above'] and last_row['RSI_Overbought'] != True:
+                if last_row['EMA_above'] and last_row['RSI_Overbought']:
                     if self.check_balance('EUR'):
                         quantity = round(eur_per_trade / current_price,2)
                         amount = round(quantity * current_price,2)
@@ -365,7 +357,7 @@ class apibot():
 
 if __name__ == '__main__':
     bot = apibot()
-    bot.check_orders(['BEAM-EUR', 'ARB-EUR', 'INJ-EUR', 'SOL-EUR', 'ADA-EUR', 'STX-EUR'])
+    bot.check_orders(['ICP-EUR', 'TRB-EUR', 'INJ-EUR'])
     app.add_handler(CallbackQueryHandler(bot.knop_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bot.tekst_handler))
     loop = asyncio.get_event_loop()
