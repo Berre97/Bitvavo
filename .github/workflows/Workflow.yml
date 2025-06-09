@@ -2,7 +2,7 @@ name: Workflow Bitvavo
 
 on:
   schedule:
-    - cron: '*/65 * * * *'  
+    - cron: '*/32 * * * *'  
   workflow_dispatch:  # Maakt handmatige triggers mogelijk
 
 jobs:
