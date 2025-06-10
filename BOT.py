@@ -314,7 +314,7 @@ class apibot():
 
     def check_orders(self, markets):
         stop_loss_percentage = 3
-        take_profit_percentage = 5
+        take_profit_percentage = 4
         eur_per_trade = 10
         for market in markets:
             current_price = bot.get_market_price(market)
