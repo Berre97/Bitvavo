@@ -43,7 +43,6 @@ class apibot():
     async def timeout_sessie(self, chat_id):
         try:
             await asyncio.sleep(900)  # 15 minuten
-            await self._bot.send_message(chat_id=chat_id, text="⏰ Tijd is verstreken. Order niet meer uitvoerbaar.")
             sys.exit()  # Hele programma stoppen
         except asyncio.CancelledError:
             pass
@@ -319,7 +318,7 @@ class apibot():
         eur_per_trade = 10
         for market in markets:
             current_price = bot.get_market_price(market)
-            df = self.get_bitvavo_data(market, '30m', 100)
+            df = self.get_bitvavo_data(market, '30m', 1)
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
@@ -348,10 +347,7 @@ class apibot():
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
                                                                      "total_paid": order["total_paid"]}
-
-                            else:
-                                pass
-
+                                    
 
 if __name__ == '__main__':
     bot = apibot()
