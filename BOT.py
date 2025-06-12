@@ -242,10 +242,12 @@ class apibot():
             df['EMA_13'] = ta.trend.ema_indicator(df['close'], window=13)
             df['EMA_21'] = ta.trend.ema_indicator(df['close'], window=21)
             df['EMA_55'] = ta.trend.ema_indicator(df['close'], window=55)
+            df['EMA_89'] = ta.trend.ema_indicator(df['dfhour_close'], window=89)
 
             df['EMA_8_above_EMA_13'] = df['EMA_8'] > df['EMA_13']
             df['EMA_13_above_EMA_21'] = df['EMA_13'] > df['EMA_21']
             df['EMA_21_above_EMA_55'] = df['EMA_21'] > df['EMA_55']
+            df['EMA_55_above_EMA_89'] = df['EMA_55'] > df['EMA_89']
 
             df['volume_MA'] = df['volume'].rolling(window=20).mean()
             df['Bullish'] = (df['EMA_8'] > df['EMA_13']) & (df['EMA_13'] > df['EMA_21']) & (df['EMA_21'] > df['EMA_55'])
@@ -270,7 +272,8 @@ class apibot():
 
             df['EMA_above'] = (df['EMA_8_above_EMA_13'] &
                                df['EMA_13_above_EMA_21'] &
-                               df['EMA_21_above_EMA_55']).rolling(window=8).sum() == 8
+                               df['EMA_21_above_EMA_55'] &
+                               df['EMA_55_above_EMA_89']).rolling(window=10).sum() == 10
 
             df['EMA_below'] = (~df['EMA_8_above_EMA_13'] &
                                ~df['EMA_13_above_EMA_21'] &
@@ -323,7 +326,7 @@ class apibot():
             if df is not None:
                 last_row = df.iloc[-1]
                 print(last_row)
-                if last_row['EMA_above'] and last_row['RSI_Overbought']:
+                if last_row['EMA_above']:
                     if self.check_balance('EUR'):
                         quantity = round(eur_per_trade / current_price,2)
                         amount = round(quantity * current_price,2)
