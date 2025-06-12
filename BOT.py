@@ -242,7 +242,7 @@ class apibot():
             df['EMA_13'] = ta.trend.ema_indicator(df['close'], window=13)
             df['EMA_21'] = ta.trend.ema_indicator(df['close'], window=21)
             df['EMA_55'] = ta.trend.ema_indicator(df['close'], window=55)
-            df['EMA_89'] = ta.trend.ema_indicator(df['dfhour_close'], window=89)
+            df['EMA_89'] = ta.trend.ema_indicator(df['close'], window=89)
 
             df['EMA_8_above_EMA_13'] = df['EMA_8'] > df['EMA_13']
             df['EMA_13_above_EMA_21'] = df['EMA_13'] > df['EMA_21']
