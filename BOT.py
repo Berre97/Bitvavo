@@ -321,7 +321,7 @@ class apibot():
         eur_per_trade = 10
         for market in markets:
             current_price = bot.get_market_price(market)
-            df = self.get_bitvavo_data(market, '30m', 1)
+            df = self.get_bitvavo_data(market, '30m', 100)
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
