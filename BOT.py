@@ -304,7 +304,6 @@ class apibot():
                 return None
         else:
             data = pd.DataFrame(response, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-            data = data.drop(data.index[500:])
             data['timestamp'] = pd.to_datetime(data['timestamp'], unit='ms')
             data[['open', 'high', 'low', 'close', 'volume']] = data[
                 ['open', 'high', 'low', 'close', 'volume']].apply(pd.to_numeric)
@@ -321,7 +320,7 @@ class apibot():
         eur_per_trade = 10
         for market in markets:
             current_price = bot.get_market_price(market)
-            df = self.get_bitvavo_data(market, '30m', 100)
+            df = self.get_bitvavo_data(market, '15m', 100)
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
