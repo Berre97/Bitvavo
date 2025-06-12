@@ -322,6 +322,7 @@ class apibot():
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
+                print(last_row)
                 if last_row['EMA_above'] and last_row['RSI_Overbought']:
                     if self.check_balance('EUR'):
                         quantity = round(eur_per_trade / current_price,2)
