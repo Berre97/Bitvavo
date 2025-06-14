@@ -346,6 +346,8 @@ class apibot():
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 i['profit'] = "{}%".format(profit)
+                                json.dump(data, f, indent=4)
+                                
                                 if profit >= take_profit_percentage:
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
