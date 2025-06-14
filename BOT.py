@@ -275,9 +275,7 @@ class apibot():
                                df['EMA_21_above_EMA_55'] &
                                df['EMA_55_above_EMA_89']).rolling(window=10).sum() == 10
 
-            df['EMA_below'] = (~df['EMA_8_above_EMA_13'] &
-                               ~df['EMA_13_above_EMA_21'] &
-                               ~df['EMA_21_above_EMA_55']).rolling(window=8).sum() == 8
+            df['EMA_below'] = (~df['EMA_8_above_EMA_13'])
 
             return df
 
@@ -346,7 +344,8 @@ class apibot():
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 print(f"Market: {market}\nProfit: {profit}")
-                                if profit >= take_profit_percentage:
+                                
+                                if last_row['EMA_below'] and profit > 0:
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
                                                                      "total_paid": order["total_paid"]}
@@ -354,7 +353,7 @@ class apibot():
 
 if __name__ == '__main__':
     bot = apibot()
-    bot.check_orders(['ICP-EUR', 'TRB-EUR', 'INJ-EUR'])
+    bot.check_orders(['GAS-EUR', 'GRASS-EUR', 'MKR-EUR', 'ICP-EUR', 'TRB-EUR', 'INJ-EUR'])
     app.add_handler(CallbackQueryHandler(bot.knop_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bot.tekst_handler))
     loop = asyncio.get_event_loop()
