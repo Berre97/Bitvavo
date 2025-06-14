@@ -324,7 +324,7 @@ class apibot():
             df = self.add_indicators(df)
             if df is not None:
                 last_row = df.iloc[-1]
-                print(last_row)
+                
                 if last_row['EMA_above']:
                     if self.check_balance('EUR'):
                         quantity = round(eur_per_trade / current_price,2)
@@ -339,13 +339,13 @@ class apibot():
 
             open_orders = bitvavo.ordersOpen({})
             if os.path.exists(bot._file_path) and bot._file_path is not None:
-                with open(bot._file_path, 'r') as f:
+                with open(bot._file_path, 'r+') as f:
                     data = json.load(f)
                     for order in data:
                         for i in open_orders:
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
-                                print(f"Market: {order['market']} profit: {profit}%")
+                                i['profit'] = "{}%".format(profit)
                                 if profit >= take_profit_percentage:
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
