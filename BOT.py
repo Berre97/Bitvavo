@@ -162,6 +162,7 @@ class apibot():
 
     async def place_market_order(self):
         if self._placesellorders:
+            print(self._placesellorders)
             for k, v in self._placesellorders.items():
                 market = k
                 id = v['Id']
@@ -334,6 +335,7 @@ class apibot():
                         self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
                         "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
                         "huidige_marktprijs": current_price}
+                        print(f"koopsignaal: {market}\nHoeveelheid: {quantity}")
 
             open_orders = bitvavo.ordersOpen({})
             if os.path.exists(bot._file_path) and bot._file_path is not None:
