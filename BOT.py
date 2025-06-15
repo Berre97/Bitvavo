@@ -324,7 +324,7 @@ class apibot():
                 
                 if last_row['EMA_above']:
                     if self.check_balance('EUR'):
-                        quantity = round(eur_per_trade / current_price,2)
+                        quantity = round(eur_per_trade / current_price,3)
                         amount = round(quantity * current_price,2)
                         stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
                         limit_price = round(stop_loss_price * 0.99, 3)
