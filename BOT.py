@@ -189,8 +189,6 @@ class apibot():
                     success_message = f"Verkoop order: {market} succesvol\n" \
                                       f"€{profit} winst!"
                     await self._bot.send_message(chat_id=self._chat_id, text=success_message)
-        else:
-            pass
 
         if self._placebuyorder:
             market = self._placebuyorder['market']
@@ -347,7 +345,8 @@ class apibot():
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 print(f"Market: {market}\nProfit: {profit}")
                                 
-                                if last_row['EMA_below'] and profit > 0:
+                                if last_row['EMA_below'] and profit > 1:
+                                    print(f"Verkooporder: {market}\nProfit: {profit}")
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
                                                                      "total_paid": order["total_paid"]}
