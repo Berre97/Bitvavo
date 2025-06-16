@@ -272,7 +272,7 @@ class apibot():
             df['EMA_above'] = (df['EMA_8_above_EMA_13'] &
                                df['EMA_13_above_EMA_21'] &
                                df['EMA_21_above_EMA_55'] &
-                               df['EMA_55_above_EMA_89']).rolling(window=10).sum() == 10
+                               df['EMA_55_above_EMA_89'])
 
             df['EMA_below'] = (~df['EMA_8_above_EMA_13'])
 
