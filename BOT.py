@@ -354,7 +354,7 @@ class apibot():
 
 if __name__ == '__main__':
     bot = apibot()
-    bot.check_orders(['GAS-EUR', 'GRASS-EUR', 'ICP-EUR', 'TRB-EUR', 'INJ-EUR'])
+    bot.check_orders(['RED-EUR', 'SLF-EUR','GAS-EUR', 'MKR-EUR', 'ICP-EUR', 'INJ-EUR'])
     app.add_handler(CallbackQueryHandler(bot.knop_handler))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, bot.tekst_handler))
     loop = asyncio.get_event_loop()
