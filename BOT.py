@@ -367,13 +367,16 @@ class apibot():
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 print(f"Market: {market}\nProfit: {profit}")
+                                i['profit'] = profit
                                 
                                 if last_row['EMA_below'] and profit > 1:
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
                                                                      "total_paid": order["total_paid"]}
+                with open (bot._file_path, 'w') as f:
+                    json.dump(data, f, indent=4)
+                    
                                     
-
 if __name__ == '__main__':
     bot = apibot()
     bot.check_orders(['RED-EUR', 'MKR-EUR', 'ICP-EUR'])
