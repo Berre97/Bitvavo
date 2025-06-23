@@ -327,7 +327,7 @@ class apibot():
                     amount = round(quantity * current_price,2)
                     stop_loss_price = current_price / (1+(stop_loss_percentage/100))
                     take_profit_price = current_price * (1+(take_profit_percentage/100))
-                    limit_price = stop_loss_price * 0.99, 3
+                    limit_price = stop_loss_price * 0.99
 
                     num_decimals_sl = 0 if stop_loss_price >= 1000 else \
                     1 if stop_loss_price >= 1000 < 10000 else \
