@@ -329,6 +329,8 @@ class apibot():
                         stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
                         limit_price = round(stop_loss_price * 0.99, 3)
                         take_profit_price = round(current_price * (1+(take_profit_percentage/100)),3)
+                        print(stop_loss_price)
+                        print(limit_price)
 
                         self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
                         "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
