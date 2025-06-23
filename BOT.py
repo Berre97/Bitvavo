@@ -322,8 +322,7 @@ class apibot():
             
             if df is not None:
                 last_row = df.iloc[-1]
-               
-                if self.check_balance('EUR'):
+                if self.check_balance('EUR') and last_row['EMA_above']:
                     quantity = round(eur_per_trade / current_price,3)
                     amount = round(quantity * current_price,2)
                     stop_loss_price = current_price / (1+(stop_loss_percentage/100))
@@ -346,13 +345,10 @@ class apibot():
 
                     stop_loss_price = round(stop_loss_price, num_decimals_sl)
                     take_profit_price = round(take_profit_price, num_decimals_tp)
-                    print(stop_loss_price)
-                    print(limit_price)
 
                     self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
                     "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
                     "huidige_marktprijs": current_price}
-                    print(f"koopsignaal: {market}\nHoeveelheid: {quantity}")
 
             open_orders = bitvavo.ordersOpen({})
             if os.path.exists(bot._file_path) and bot._file_path is not None:
@@ -365,7 +361,6 @@ class apibot():
                                 print(f"Market: {market}\nProfit: {profit}")
                                 
                                 if last_row['EMA_below'] and profit > 1:
-                                    print(f"Verkooporder: {market}\nProfit: {profit}")
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
                                                                      "total_paid": order["total_paid"]}
