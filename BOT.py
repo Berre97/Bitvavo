@@ -319,23 +319,40 @@ class apibot():
             current_price = bot.get_market_price(market)
             df = self.get_bitvavo_data(market, '15m', 100)
             df = self.add_indicators(df)
+            
             if df is not None:
                 last_row = df.iloc[-1]
-                
-                if last_row['EMA_above']:
-                    if self.check_balance('EUR'):
-                        quantity = round(eur_per_trade / current_price,3)
-                        amount = round(quantity * current_price,2)
-                        stop_loss_price = round(current_price / (1+(stop_loss_percentage/100)),3)
-                        limit_price = round(stop_loss_price * 0.99, 3)
-                        take_profit_price = round(current_price * (1+(take_profit_percentage/100)),3)
-                        print(stop_loss_price)
-                        print(limit_price)
+               
+                if self.check_balance('EUR'):
+                    quantity = round(eur_per_trade / current_price,3)
+                    amount = round(quantity * current_price,2)
+                    stop_loss_price = current_price / (1+(stop_loss_percentage/100))
+                    take_profit_price = current_price * (1+(take_profit_percentage/100))
+                    limit_price = round(stop_loss_price * 0.99, 3)
 
-                        self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
-                        "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
-                        "huidige_marktprijs": current_price}
-                        print(f"koopsignaal: {market}\nHoeveelheid: {quantity}")
+                    num_decimals_sl = 0 if stop_loss_price >= 1000 else \
+                    1 if stop_loss_price >= 1000 < 10000 else \
+                    2 if stop_loss_price >= 100 < 1000 else \
+                    3 if stop_loss_price >= 10 < 100 else \
+                    4 if stop_loss_price >= 1 < 10 else \
+                    5 if stop_loss_price < 1 else None
+
+                    num_decimals_tp = 0 if take_profit_price >= 1000 else \
+                    1 if take_profit_price >= 1000 < 10000 else \
+                    2 if take_profit_price >= 100 < 1000 else \
+                    3 if take_profit_price >= 10 < 100 else \
+                    4 if take_profit_price >= 1 < 10 else \
+                    5 if take_profit_price < 1 else None
+
+                    stop_loss_price = round(stop_loss_price, num_decimals_sl)
+                    take_profit_price = round(take_profit_price, num_decimals_tp)
+                    print(stop_loss_price)
+                    print(limit_price)
+
+                    self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
+                    "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
+                    "huidige_marktprijs": current_price}
+                    print(f"koopsignaal: {market}\nHoeveelheid: {quantity}")
 
             open_orders = bitvavo.ordersOpen({})
             if os.path.exists(bot._file_path) and bot._file_path is not None:
