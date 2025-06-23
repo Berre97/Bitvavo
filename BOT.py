@@ -327,7 +327,7 @@ class apibot():
                     amount = round(quantity * current_price,2)
                     stop_loss_price = current_price / (1+(stop_loss_percentage/100))
                     take_profit_price = current_price * (1+(take_profit_percentage/100))
-                    limit_price = round(stop_loss_price * 0.99, 3)
+                    limit_price = stop_loss_price * 0.99, 3
 
                     num_decimals_sl = 0 if stop_loss_price >= 1000 else \
                     1 if stop_loss_price >= 1000 < 10000 else \
@@ -343,8 +343,16 @@ class apibot():
                     4 if take_profit_price >= 1 < 10 else \
                     5 if take_profit_price < 1 else None
 
+                    num_decimals_lp = 0 if limit_price >= 1000 else \
+                    1 if limit_price >= 1000 < 10000 else \
+                    2 if limit_price >= 100 < 1000 else \
+                    3 if limit_price >= 10 < 100 else \
+                    4 if limit_price >= 1 < 10 else \
+                    5 if limit_price < 1 else None
+
                     stop_loss_price = round(stop_loss_price, num_decimals_sl)
                     take_profit_price = round(take_profit_price, num_decimals_tp)
+                    limit_price = round(limit_price, num_decimals_lp)
 
                     self._buy_signals[market] = {"hoeveelheid": quantity, "orderprijs": amount,
                     "take_profit": take_profit_price, "stop_loss": stop_loss_price, "stop_limit": limit_price,
