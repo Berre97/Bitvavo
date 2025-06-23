@@ -67,7 +67,7 @@ class apibot():
             prijs_per_eenheid = value['huidige_marktprijs']
             markt = key
 
-            buy_message = f"Koopsignaal gedetecteerd:\nValuta: {markt}\nPrijs per eenheid: €{round(prijs_per_eenheid,2)}\n\n " \
+            buy_message = f"Koopsignaal:\nValuta: {markt}\nPrijs per eenheid: €{round(prijs_per_eenheid,2)}\n\n " \
                           f"Totaalbedrag: €{value['orderprijs']}\n" \
                           f"Je hebt €{self.check_balance('EUR')} beschikbaar, wil je deze aankoop bevestigen?"
 
@@ -218,24 +218,10 @@ class apibot():
         return float(ticker['price']) if 'price' in ticker else None
 
     def add_indicators(self, df):
-        # Beweeglijke gemiddelden
         if df is not None:
-
             df['SMA_50'] = ta.trend.sma_indicator(df['close'], window=50)
             df['SMA_20'] = ta.trend.sma_indicator(df['close'], window=20)
             df['SMA_200'] = ta.trend.sma_indicator(df['close'], window=200)
-
-            # Relatieve sterkte-index (RSI)
-            df['RSI'] = ta.momentum.rsi(df['close'], window=14)
-
-            # Moving Average Convergence Divergence (MACD)
-            df['MACD'] = ta.trend.macd(df['close'])
-            df['MACD_signal'] = ta.trend.macd_signal(df['close'])
-
-            # Bollinger Bands
-            bollinger = ta.volatility.BollingerBands(df['close'], window=20, window_dev=2)
-            df['Bollinger_High'] = bollinger.bollinger_hband()
-            df['Bollinger_Low'] = bollinger.bollinger_lband()
 
             df['EMA_8'] = ta.trend.ema_indicator(df['close'], window=8)
             df['EMA_13'] = ta.trend.ema_indicator(df['close'], window=13)
@@ -248,26 +234,6 @@ class apibot():
             df['EMA_21_above_EMA_55'] = df['EMA_21'] > df['EMA_55']
             df['EMA_55_above_EMA_89'] = df['EMA_55'] > df['EMA_89']
 
-            df['volume_MA'] = df['volume'].rolling(window=20).mean()
-            df['Bullish'] = (df['EMA_8'] > df['EMA_13']) & (df['EMA_13'] > df['EMA_21']) & (df['EMA_21'] > df['EMA_55'])
-            df['Bearish'] = (df['EMA_8'] < df['EMA_13']) & (df['EMA_13'] < df['EMA_21']) & (df['EMA_21'] < df['EMA_55'])
-
-
-            # RSI Overbought / Oversold
-            df['RSI_Overbought'] = np.where(df['RSI'] >= 65, True, False)
-            df['RSI_Oversold'] = np.where(df['RSI'] <= 35, True, False)
-
-            # MACD Crossovers
-            df['MACD_Bullish'] = np.where(
-                (df['MACD'] > df['MACD_signal']) & (df['MACD'].shift(1) <= df['MACD_signal'].shift(1)),
-                True, False)
-            df['MACD_Bearish'] = np.where(
-                (df['MACD'] < df['MACD_signal']) & (df['MACD'].shift(1) >= df['MACD_signal'].shift(1)),
-                True, False)
-
-            # Bollinger Bands Cross
-            df['Bollinger_Breakout_High'] = np.where((df['close'] > df['Bollinger_High']), True, False)
-            df['Bollinger_Breakout_Low'] = np.where((df['close'] < df['Bollinger_Low']), True, False)
 
             df['EMA_above'] = (df['EMA_8_above_EMA_13'] &
                                df['EMA_13_above_EMA_21'] &
@@ -366,9 +332,9 @@ class apibot():
                         for i in open_orders:
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
-                                print(f"Market: {market}\nProfit: {profit}")
-                                order['profit'] = profit
-                                
+                                order['huidige_prijs] = current_price 
+                                order['profit'] = "{}%".format(profit)
+                            
                                 if last_row['EMA_below'] and profit > 1:
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
