@@ -367,7 +367,7 @@ class apibot():
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 print(f"Market: {market}\nProfit: {profit}")
-                                i['profit'] = profit
+                                order['profit'] = profit
                                 
                                 if last_row['EMA_below'] and profit > 1:
                                     bitvavo.cancelOrder(market, order["Id"])
