@@ -335,7 +335,7 @@ class apibot():
                                 order['huidige_marktprijs'] = current_price 
                                 order['profit'] = "{}%".format(profit)
                             
-                                if last_row['EMA_below'] and profit > 1:
+                                if last_row['EMA_below'] and profit >= 2:
                                     bitvavo.cancelOrder(market, order["Id"])
                                     self._placesellorders[market] = {"amount": order["amount"], "Id": order["Id"],
                                                                      "total_paid": order["total_paid"]}
