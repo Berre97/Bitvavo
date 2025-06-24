@@ -382,8 +382,8 @@
         "price": "3.975",
         "total_paid": 9.99,
         "Id": "00000000-0000-04ad-0100-000163e5f710",
-        "profit": "8.2%",
-        "huidige_marktprijs": 4.3011
+        "profit": "6.88%",
+        "huidige_marktprijs": 4.2485
     },
     {
         "market": "MKR-EUR",
@@ -400,8 +400,8 @@
         "price": "4.0767",
         "total_paid": 10.04,
         "Id": "00000000-0000-04ad-0100-0001651e630f",
-        "profit": "5.5%",
-        "huidige_marktprijs": 4.3011
+        "profit": "4.21%",
+        "huidige_marktprijs": 4.2485
     },
     {
         "market": "ICP-EUR",
@@ -409,8 +409,8 @@
         "price": "4.0549",
         "total_paid": 10.03,
         "Id": "00000000-0000-04ad-0100-000165311f4f",
-        "profit": "6.07%",
-        "huidige_marktprijs": 4.3011
+        "profit": "4.77%",
+        "huidige_marktprijs": 4.2485
     },
     {
         "market": "ICP-EUR",
@@ -418,7 +418,7 @@
         "price": "4.1153",
         "total_paid": 10.08,
         "Id": "00000000-0000-04ad-0100-00016554b51a",
-        "profit": "4.51%",
-        "huidige_marktprijs": 4.3011
+        "profit": "3.24%",
+        "huidige_marktprijs": 4.2485
     }
 ]
