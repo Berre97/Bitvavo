@@ -443,8 +443,8 @@
         "price": "0.24169",
         "total_paid": 10.06,
         "Id": "00000000-0000-05d4-0100-000167cea3f4",
-        "huidige_marktprijs": 0.24161,
-        "profit": "-0.03%"
+        "huidige_marktprijs": 0.23955,
+        "profit": "-0.89%"
     },
     {
         "market": "RED-EUR",
@@ -452,8 +452,8 @@
         "price": "0.24172",
         "total_paid": 10.03,
         "Id": "00000000-0000-05d4-0100-000167eba79e",
-        "huidige_marktprijs": 0.24161,
-        "profit": "-0.05%"
+        "huidige_marktprijs": 0.23955,
+        "profit": "-0.9%"
     },
     {
         "market": "RED-EUR",
@@ -461,7 +461,7 @@
         "price": "0.24032",
         "total_paid": 9.98,
         "Id": "00000000-0000-05d4-0100-0001682d7d2e",
-        "huidige_marktprijs": 0.24161,
-        "profit": "0.54%"
+        "huidige_marktprijs": 0.23955,
+        "profit": "-0.32%"
     }
 ]
