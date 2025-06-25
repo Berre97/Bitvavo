@@ -21,5 +21,6 @@ jobs:
       - name: Run script
         env:
           FILE_PATH_BUYORDERS: ${{ env.FILE_PATH_BUYORDERS}}
+          API_KEYS: ${{ secrets.APIKEYS }}
         run: |
           python summary.py
