@@ -22,4 +22,4 @@ jobs:
         env:
           FILE_PATH_BUYORDERS: ${{ env.FILE_PATH_BUYORDERS}}
         run: |
-          summary.py
+          python summary.py
