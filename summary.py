@@ -6,7 +6,7 @@ import os
 now = datetime.now()
 past_week = now-timedelta(days=7)
 buyorders = os.getenv("FILE_PATH_BUYORDERS")
-api_keys = os.getenv("API_KEYS")
+api_keys = json.loads(os.getenv('API_KEYS'))
 weekly_profit = []
 token = api_keys['token']
 chat_id = api_keys["chat_id"]
