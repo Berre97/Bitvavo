@@ -162,7 +162,6 @@ class apibot():
 
     async def place_market_order(self):
         if self._placesellorders:
-            print(self._placesellorders)
             for k, v in self._placesellorders.items():
                 market = k
                 id = v['Id']
@@ -186,9 +185,23 @@ class apibot():
                     await self._bot.send_message(chat_id=self._chat_id, text=error_message)
 
                 else:
+                    date = datetime.now()
                     success_message = f"Verkoop order: {market} succesvol\n" \
                                       f"€{profit} winst!"
                     await self._bot.send_message(chat_id=self._chat_id, text=success_message)
+
+                    if os.path.exists(file_path):
+                        with open(self._file_path, "r") as f:       
+                            data = json.read(f)
+            
+                    with open(self._file_path, "w") as f:
+                        for order in data:
+                            if order['Id'] == id:
+                                order['eur_profit'] = profit
+                                order['date'] = datetime.date(now)
+                                order['type'] = "sold"
+                                
+                        json.dump(data, f, indent=4)
 
         if self._placebuyorder:
             market = self._placebuyorder['market']
@@ -197,7 +210,7 @@ class apibot():
             fee_paid = float(order["fills"][0]["fee"])
             amount_filled = float(order["filledAmountQuote"])
             total_paid = round(fee_paid+amount_filled,2)
-            self._writebuyorder = {"market": market, "amount": order["fills"][0]["amount"],
+            self._writebuyorder = {"type": "open", "market": market, "amount": order["fills"][0]["amount"],
                                    "price": order["fills"][0]["price"], "total_paid": total_paid}
 
 
@@ -333,7 +346,7 @@ class apibot():
                             if order['market'] == market and i["orderId"] == order["Id"]:
                                 profit = round((float(current_price) - float(order['price'])) / float(order['price']) * 100, 2)
                                 order['huidige_marktprijs'] = current_price 
-                                order['profit'] = "{}%".format(profit)
+                                order['profit_percentage'] = "{}%".format(profit)
                             
                                 if last_row['EMA_below'] and profit >= 2:
                                     bitvavo.cancelOrder(market, order["Id"])
