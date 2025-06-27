@@ -463,5 +463,13 @@
         "Id": "00000000-0000-05d4-0100-0001682d7d2e",
         "huidige_marktprijs": 0.23367,
         "profit": "-2.77%"
+    },
+    {
+        "type": "open",
+        "market": "ICP-EUR",
+        "amount": "2.444",
+        "price": "4.0942",
+        "total_paid": 10.04,
+        "Id": "00000000-0000-04ad-0100-000173ef6aca"
     }
 ]
