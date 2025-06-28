@@ -471,8 +471,8 @@
         "price": "4.0942",
         "total_paid": 10.04,
         "Id": "00000000-0000-04ad-0100-000173ef6aca",
-        "huidige_marktprijs": 4.0423,
-        "profit_percentage": "-1.27%"
+        "huidige_marktprijs": 4.0409,
+        "profit_percentage": "-1.3%"
     },
     {
         "type": "open",
@@ -481,8 +481,8 @@
         "price": "4.0477",
         "total_paid": 10.04,
         "Id": "00000000-0000-04ad-0100-0001740bae1b",
-        "huidige_marktprijs": 4.0423,
-        "profit_percentage": "-0.13%"
+        "huidige_marktprijs": 4.0409,
+        "profit_percentage": "-0.17%"
     },
     {
         "type": "open",
